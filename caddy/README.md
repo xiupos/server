@@ -22,6 +22,5 @@ docker-compose down
 ```
 vim Caddyfile
 
-docker-compose down
-docker-compose up -d
+docker-compose restart # && docker-compose logs -f
 ```
