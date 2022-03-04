@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  rainloop:
+    image: hardware/rainloop
+    restart: always
+    networks:
+      - external_network
+    volumes:
+      - ./data/:/rainloop/data
+
+networks:
+  external_network:
+    external: true

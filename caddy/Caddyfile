@@ -40,3 +40,10 @@ netdata.x4s.io {
     import default
   }
 }
+
+mail.x4s.io {
+  import cloudflare
+  reverse_proxy rainloop:8888 {
+    import default
+  }
+}
