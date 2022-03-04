@@ -33,3 +33,10 @@ posky-dev.x4s.io {
     import default
   }
 }
+
+netdata.x4s.io {
+  import cloudflare
+  reverse_proxy netdata:19999 {
+    import default
+  }
+}

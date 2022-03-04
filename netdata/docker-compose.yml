@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  netdata:
+    image: netdata/netdata
+    restart: always
+    hostname: netdata.x4s.io
+    networks:
+      - external_network
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - netdataconfig:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+
+volumes:
+  netdataconfig:
+  netdatalib:
+  netdatacache:
+
+networks:
+  external_network:
+    external: true
