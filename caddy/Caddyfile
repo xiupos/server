@@ -47,3 +47,10 @@ mail.x4s.io {
     import default
   }
 }
+
+tex.x4s.io {
+  import cloudflare
+  reverse_proxy overleaf {
+    import default
+  }
+}

@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  overleaf:
+    build: .
+    restart: always
+    hostname: tex.x4s.io
+    networks:
+      - internal_network
+      - external_network
+    env_file:
+      - docker.env
+    volumes:
+      - ./data/sharelatex:/var/lib/sharelatex
+
+  db:
+    image: mongo:4.0
+    restart: always
+    networks:
+      - internal_network
+    volumes:
+      - ./data/db:/data/db
+
+  redis:
+    image: redis:5
+    restart: always
+    networks:
+      - internal_network
+    volumes:
+      - ./data/redis:/data
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
