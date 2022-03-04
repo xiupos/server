@@ -1,0 +1,35 @@
+{
+  email {env.MAIL}
+}
+
+(cloudflare) {
+  tls {
+    dns cloudflare {env.CF_API_TOKEN}
+    resolvers 1.1.1.1
+  }
+}
+
+(default) {
+  header_up Host {host}
+  transport http {
+    versions 1.1
+  }
+
+  header_up X-Real-IP {remote_addr}
+  header_up X-Forwarded-For {proxy_add_x_forwarded_for}
+  header_up X-Forwarded-Proto https
+}
+
+mk.xiupos.net {
+  import cloudflare
+  reverse_proxy misskey {
+    import default
+  }
+}
+
+posky-dev.x4s.io {
+  import cloudflare
+  reverse_proxy misskey-dev {
+    import default
+  }
+}

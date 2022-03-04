@@ -1,0 +1,8 @@
+[Unit]
+Description=Backup server data
+
+[Timer]
+OnUnitActiveSec=60m
+
+[Install]
+WantedBy=timers.target

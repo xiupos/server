@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  caddy:
+    build: .
+    restart: always
+    networks:
+      - external_network
+    ports:
+      - "80:80"
+      - "443:443/tcp"
+      - "443:443/udp"
+    env_file:
+      - docker.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy_data:/data/caddy
+      - ./data/caddy_config:/config/caddy
+      - ./data/caddy_log:/var/log/caddy
+      - ./contents:/contents:ro
+
+networks:
+  external_network:
+    external: true

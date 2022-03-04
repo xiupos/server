@@ -1,0 +1,17 @@
+url: https://posky-dev.x4s.io/
+port: 80
+
+db:
+  host: db
+  port: 5432
+  db: misskey
+  user: example-misskey-user
+  pass: example-misskey-pass
+
+redis:
+  host: redis
+  port: 6379
+
+proxy: http://127.0.0.1:3128
+
+id: 'aid'

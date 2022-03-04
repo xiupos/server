@@ -1,0 +1,11 @@
+[Unit]
+Description=Backup server data
+
+[Service]
+Type=simple
+ExecStart=bash /home/ubuntu/server/backup.sh
+User=ubuntu
+Group=ubuntu
+
+[Install]
+WantedBy=multi-user.target

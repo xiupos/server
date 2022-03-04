@@ -1,0 +1,9 @@
+/.vscode
+!/.vscode/extensions.json
+/.idea
+*.pem
+*.log
+*.code-workspace
+.DS_Store
+
+rclone.conf
