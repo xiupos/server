@@ -54,3 +54,10 @@ tex.x4s.io {
     import default
   }
 }
+
+task.x4s.io {
+  import cloudflare
+  reverse_proxy taskcafe:3333 {
+    import default
+  }
+}
