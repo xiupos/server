@@ -4,6 +4,9 @@ services:
   overleaf:
     build: .
     restart: always
+    links:
+      - db
+      - redis
     hostname: tex.x4s.io
     networks:
       - internal_network
