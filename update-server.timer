@@ -2,7 +2,7 @@
 Description=Backup server data
 
 [Timer]
-OnCalendar=5:0:00
+OnCalendar=weekly
 
 [Install]
 WantedBy=timers.target
