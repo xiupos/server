@@ -65,6 +65,7 @@ sudo gpasswd -a ubuntu docker
 sudo curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
+# sudo reboot
 
 ################################
 # Initialize
@@ -72,6 +73,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 docker network create external_network
 
+sudo apt install -y git
+git clone https://github.com/xiupos/server.git
 ```
 
 1. [Start RCLONE](rclone/README.md)
