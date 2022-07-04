@@ -27,6 +27,13 @@ mk.xiupos.net {
   }
 }
 
+m.x4s.io {
+  import cloudflare
+  reverse_proxy misskey-x4s {
+    import default
+  }
+}
+
 posky-dev.x4s.io {
   import cloudflare
   reverse_proxy misskey-dev {

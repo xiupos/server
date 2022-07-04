@@ -1,0 +1,15 @@
+url: https://m.x4s.io/
+port: 80
+
+db:
+  host: db
+  port: 5432
+  db: misskey
+  user: example-misskey-user
+  pass: example-misskey-pass
+
+redis:
+  host: redis
+  port: 6379
+
+id: 'aid'
