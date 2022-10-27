@@ -34,37 +34,16 @@ m.x4s.io {
   }
 }
 
-posky-dev.x4s.io {
+mk-dev.xiupos.net {
   import cloudflare
   reverse_proxy misskey-dev {
     import default
   }
 }
 
-netdata.x4s.io {
+netdata.xiupos.net {
   import cloudflare
   reverse_proxy netdata:19999 {
-    import default
-  }
-}
-
-mail.x4s.io {
-  import cloudflare
-  reverse_proxy rainloop:8888 {
-    import default
-  }
-}
-
-tex.x4s.io {
-  import cloudflare
-  reverse_proxy overleaf {
-    import default
-  }
-}
-
-task.x4s.io {
-  import cloudflare
-  reverse_proxy taskcafe:3333 {
     import default
   }
 }
