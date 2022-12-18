@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  obsidian-livesync:
+    image: couchdb:3.1.2
+    ports:
+        - "80:5984"
+    environment:
+        - COUCHDB_USER=admin
+        - COUCHDB_PASSWORD=password
+    volumes:
+        - ./data/couchdb:/opt/couchdb/data
+        - ./local.ini:/opt/couchdb/etc/local.ini
+    networks:
+        - external_network
+    restart: always
+
+networks:
+  external_network:
+    external: true
