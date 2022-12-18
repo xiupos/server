@@ -50,13 +50,5 @@ netdata.xiupos.net {
 
 obsidian-livesync.xiupos.net {
   import cloudflare
-  handle_path /* {
-    respond "\"\" 403"
-    header {
-      Server ""
-    }
-  }
-  handle_path /e=_/* {
-    reverse_proxy obsidian-livesync:5984
-  }
+  reverse_proxy obsidian-livesync:5984
 }
