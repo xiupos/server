@@ -75,6 +75,9 @@ docker network create external_network
 
 sudo apt install -y git
 git clone https://github.com/xiupos/server.git
+
+cp example-docker.env docker.env
+vim docker.env
 ```
 
 1. [Start RCLONE](rclone/README.md)

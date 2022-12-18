@@ -1,9 +1,6 @@
 ## Install
 
 ```
-cp example-docker.env docker.env
-vim docker.env
-
 docker-compose up -d
 ```
 

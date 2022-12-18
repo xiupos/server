@@ -3,6 +3,8 @@ version: "3.7"
 services:
   obsidian-livesync:
     image: couchdb:3.1.2
+    env_file:
+      - ../docker.env
     environment:
         - COUCHDB_USER=admin
         - COUCHDB_PASSWORD=password

@@ -10,7 +10,7 @@ services:
       - "443:443/tcp"
       - "443:443/udp"
     env_file:
-      - docker.env
+      - ../docker.env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data/caddy_data:/data/caddy
