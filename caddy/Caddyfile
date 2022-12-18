@@ -1,10 +1,10 @@
 {
-  email {env.CADDY_MAIL}
+  email {env.MAIL}
 }
 
 (cloudflare) {
   tls {
-    dns cloudflare {env.CADDY_CF_API_TOKEN}
+    dns cloudflare {env.CF_API_TOKEN}
     resolvers 1.1.1.1
   }
 }
