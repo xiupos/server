@@ -6,6 +6,4 @@
 *.code-workspace
 .DS_Store
 
-/*/backup
-/*/data
-/docker.env
+/data
