@@ -6,8 +6,8 @@ services:
     env_file:
       - ../docker.env
     environment:
-        - COUCHDB_USER=admin
-        - COUCHDB_PASSWORD=password
+        - COUCHDB_USER=${COUCHDB_USER}
+        - COUCHDB_PASSWORD=${COUCHDB_PW}
     volumes:
         - ./data/couchdb:/opt/couchdb/data
         - ./local.ini:/opt/couchdb/etc/local.ini
