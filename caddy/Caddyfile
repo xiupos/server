@@ -41,6 +41,13 @@ mk-dev.xiupos.net {
   }
 }
 
+mk-v13.xiupos.net {
+  import cloudflare
+  reverse_proxy misskey-v13 {
+    import default
+  }
+}
+
 netdata.xiupos.net {
   import cloudflare
   reverse_proxy netdata:19999 {
