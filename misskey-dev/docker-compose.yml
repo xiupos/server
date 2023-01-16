@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   misskey-dev:
-    image: ghcr.io/xiupos/misskey:develop
+    image: ghcr.io/xiupos/misskey:latest
     restart: always
     links:
       - db
