@@ -14,4 +14,13 @@ redis:
 
 proxy: http://127.0.0.1:3128
 
+proxyBypassHosts:
+  - api.deepl.com
+  - api-free.deepl.com
+  - www.recaptcha.net
+  - hcaptcha.com
+  - challenges.cloudflare.com
+
 id: 'aid'
+
+signToActivityPubGet: true
