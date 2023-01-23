@@ -6,8 +6,8 @@ services:
     env_file:
       - .config/docker.env
     volumes:
-      - ./data/db:/var/lib/postgresql/data
-      - ./data/tmp/:/tmp/pg_upgrade/
+      - ./data/db:/var/lib/postgresql/data:ro
+      - ./data/tmp:/tmp/pg_upgrade
 
   db-v15:
     image: postgres:15-alpine
@@ -15,4 +15,4 @@ services:
       - .config/docker.env
     volumes:
       - ./data/db:/var/lib/postgresql/data
-      - ./data/tmp/:/tmp/pg_upgrade/
+      - ./data/tmp:/tmp/pg_upgrade
