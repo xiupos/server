@@ -14,6 +14,7 @@ docker-compose -f $DIR/docker-compose.pg_upgrade.yml exec db-v12 sh -c "
 "
 docker-compose -f $DIR/docker-compose.yml down
 
+sudo  rm -rf $DIR/data/db
 docker-compose -f $DIR/docker-compose.pg_upgrade.yml up -d db-v15
 docker-compose -f $DIR/docker-compose.pg_upgrade.yml exec db-v15 sh -c "
   PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER $POSTGRES_DB < /tmp/pg_upgrade/dump.psql
