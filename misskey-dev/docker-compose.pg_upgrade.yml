@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  db-v12:
+    image: postgres:12.2-alpine
+    env_file:
+      - .config/docker.env
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./data/tmp/:/tmp/pg_upgrade/
+
+  db-v15:
+    image: postgres:15-alpine
+    env_file:
+      - .config/docker.env
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./data/tmp/:/tmp/pg_upgrade/
