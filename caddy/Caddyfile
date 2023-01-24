@@ -40,8 +40,3 @@ netdata.xiupos.net {
     import default
   }
 }
-
-obsidian-livesync.xiupos.net {
-  import cloudflare
-  reverse_proxy obsidian-livesync:5984
-}
