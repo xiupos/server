@@ -12,6 +12,14 @@ redis:
   host: redis
   port: 6379
 
+#meilisearch:
+#  host: meilisearch
+#  port: 7700
+#  apiKey: ''
+#  ssl: true
+
+proxy: http://127.0.0.1:3128
+
 proxyBypassHosts:
   - api.deepl.com
   - api-free.deepl.com
