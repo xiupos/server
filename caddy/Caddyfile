@@ -34,16 +34,16 @@ mk-dev.xiupos.net {
   }
 }
 
-netdata.xiupos.net {
+m.huling.org {
   import cloudflare
-  reverse_proxy netdata:19999 {
+  reverse_proxy misskey-huling {
     import default
   }
 }
 
-m.huling.org {
+netdata.xiupos.net {
   import cloudflare
-  reverse_proxy misskey-huling {
+  reverse_proxy netdata:19999 {
     import default
   }
 }
