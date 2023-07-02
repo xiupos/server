@@ -40,3 +40,10 @@ netdata.xiupos.net {
     import default
   }
 }
+
+m.huling.org {
+  import cloudflare
+  reverse_proxy misskey-huling {
+    import default
+  }
+}
