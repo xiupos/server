@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   misskey-huling:
-    image: misskey/misskey:latest
+    image: ghcr.io/xiupos/misskey:latest
     restart: always
     links:
       - db
