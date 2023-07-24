@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n
+    image: docker.n8n.io/n8nio/n8n:next
     restart: always
     hostname: workflow.xiupos.net
     environment:
