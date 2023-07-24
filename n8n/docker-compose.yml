@@ -4,10 +4,10 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n
     restart: always
+    hostname: n8n.xiupos.net
     environment:
       - GENERIC_TIMEZONE="Asia/Tokyo"
       - TZ="Europe/Berlin"
-      - VUE_APP_URL_BASE_API=https://n8n.xiupos.net/
     networks:
       - external_network
     volumes:
