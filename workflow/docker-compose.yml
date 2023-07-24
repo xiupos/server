@@ -7,7 +7,7 @@ services:
     hostname: workflow.xiupos.net
     environment:
       - GENERIC_TIMEZONE="Asia/Tokyo"
-      - TZ="Europe/Berlin"
+      - TZ="Asia/Tokyo"
       - WEBHOOK_URL=https://workflow.xiupos.net/
     networks:
       - external_network
