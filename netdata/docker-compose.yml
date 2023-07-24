@@ -4,13 +4,9 @@ services:
   netdata:
     image: netdata/netdata
     restart: always
-    hostname: netdata.x4s.io
+    hostname: netdata.xiupos.net
     networks:
       - external_network
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
     volumes:
       - netdataconfig:/etc/netdata
       - netdatalib:/var/lib/netdata

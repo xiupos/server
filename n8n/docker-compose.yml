@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    environment:
+      - GENERIC_TIMEZONE="Asia/Tokyo"
+      - TZ="Europe/Berlin"
+    networks:
+      - external_network
+    volumes:
+      - ./data:/home/node/.n8n
+
+networks:
+  external_network:
+    external: true
