@@ -4,11 +4,11 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n
     restart: always
-    hostname: n8n.xiupos.net
+    hostname: workflow.xiupos.net
     environment:
       - GENERIC_TIMEZONE="Asia/Tokyo"
       - TZ="Europe/Berlin"
-      - WEBHOOK_URL=https://n8n.xiupos.net/
+      - WEBHOOK_URL=https://workflow.xiupos.net/
     networks:
       - external_network
     volumes:
