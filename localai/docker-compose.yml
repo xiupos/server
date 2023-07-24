@@ -4,7 +4,7 @@ services:
   localai:
     image: quay.io/go-skynet/local-ai:latest
     restart: always
-    hostname: localai.xiupos.net
+    hostname: localai:8080
     networks:
       - external_network
     env_file:

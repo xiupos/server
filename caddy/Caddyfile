@@ -54,10 +54,3 @@ netdata.xiupos.net {
     import default
   }
 }
-
-localai.xiupos.net {
-  import cloudflare
-  reverse_proxy localai:8080 {
-    import default
-  }
-}
