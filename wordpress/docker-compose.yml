@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+    networks:
+      - internal_network
+      - external_network
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./data/db:/var/lib/mysql
+    restart: always
+    networks:
+      - internal_network
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true

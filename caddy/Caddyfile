@@ -54,3 +54,10 @@ netdata.xiupos.net {
     import default
   }
 }
+
+wp.xiupos.net {
+  import cloudflare
+  reverse_proxy wordpress {
+    import default
+  }
+}
