@@ -41,6 +41,13 @@ m.huling.org {
   }
 }
 
+phys.xiupos.net {
+  import cloudflare
+  reverse_proxy phys {
+    import default
+  }
+}
+
 workflow.xiupos.net {
   import cloudflare
   reverse_proxy n8n:5678 {
