@@ -43,7 +43,7 @@ m.huling.org {
 
 phys.xiupos.net {
   import cloudflare
-  reverse_proxy phys {
+  reverse_proxy misskey-phys {
     import default
   }
 }
