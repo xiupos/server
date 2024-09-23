@@ -5,6 +5,4 @@ source $DIR/.config/docker.env
 
 # Create backup
 mkdir -p $DIR/backup
-docker-compose -f $DIR/docker-compose.yml exec -T db \
-  pg_dumpall -U $POSTGRES_USER | gzip -c > $DIR/backup/pgdumpall.gz
-tar -C $DIR -zcvf $DIR/backup/files.tar.gz data/files
+sudo tar -C $DIR -zcvf backup/data.tar.gz data

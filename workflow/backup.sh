@@ -5,4 +5,4 @@ source $DIR/.config/docker.env
 
 # Create backup
 mkdir -p $DIR/backup
-tar -C $DIR -zcvf backup/data.tar.gz data
+sudo tar -C $DIR -zcvf backup/data.tar.gz data
