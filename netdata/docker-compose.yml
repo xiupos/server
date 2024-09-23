@@ -4,7 +4,7 @@ services:
   netdata:
     image: netdata/netdata
     restart: always
-    hostname: netdata.xiupos.net
+    hostname: tokyo.xiupos.net
     networks:
       - external_network
     volumes:

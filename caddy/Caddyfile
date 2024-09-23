@@ -55,7 +55,7 @@ workflow.xiupos.net {
   }
 }
 
-netdata.xiupos.net {
+tokyo.xiupos.net {
   import cloudflare
   reverse_proxy netdata:19999 {
     import default
