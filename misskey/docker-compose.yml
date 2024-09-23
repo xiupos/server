@@ -16,6 +16,7 @@ services:
       - "3000:80"
     networks:
       - internal_network
+      - external_network
     # env_file:
     #   - .config/docker.env
     volumes:
@@ -94,3 +95,4 @@ services:
 networks:
   internal_network:
     internal: true
+  external_network:

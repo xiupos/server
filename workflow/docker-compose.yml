@@ -5,9 +5,14 @@ services:
     hostname: workflow.xiupos.net
     ports:
       - "5678:5678"
+    networks:
+      - external_network
     environment:
       - GENERIC_TIMEZONE="Asia/Tokyo"
       - TZ="Asia/Tokyo"
       - WEBHOOK_URL=https://workflow.xiupos.net/
     volumes:
       - ./data:/home/node/.n8n
+
+networks:
+  - external_network

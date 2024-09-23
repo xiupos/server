@@ -5,6 +5,8 @@ services:
     hostname: sapporo.xiupos.net
     ports:
       - "19999:19999"
+    networks:
+      - external_network
     volumes:
       - netdataconfig:/etc/netdata
       - netdatalib:/var/lib/netdata
@@ -19,3 +21,6 @@ volumes:
   netdataconfig:
   netdatalib:
   netdatacache:
+
+networks:
+  external_network:
