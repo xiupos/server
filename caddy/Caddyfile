@@ -22,35 +22,35 @@
 
 mk.xiupos.net {
   import cloudflare
-  reverse_proxy misskey {
+  reverse_proxy sapporo:3000 {
     import default
   }
 }
 
 mk-dev.xiupos.net {
   import cloudflare
-  reverse_proxy misskey-dev {
+  reverse_proxy sapporo:3001 {
     import default
   }
 }
 
 m.huling.org {
   import cloudflare
-  reverse_proxy misskey-huling {
+  reverse_proxy sapporo:3002 {
     import default
   }
 }
 
 phys.xiupos.net {
   import cloudflare
-  reverse_proxy misskey-phys {
+  reverse_proxy sapporo:3003 {
     import default
   }
 }
 
 workflow.xiupos.net {
   import cloudflare
-  reverse_proxy n8n:5678 {
+  reverse_proxy sapporo:3004 {
     import default
   }
 }
@@ -62,9 +62,9 @@ tokyo.xiupos.net {
   }
 }
 
-wp.xiupos.net {
+sapporo.xiupos.net {
   import cloudflare
-  reverse_proxy wordpress {
+  reverse_proxy sapporo:19999 {
     import default
   }
 }
