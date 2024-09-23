@@ -1,12 +1,10 @@
-version: "3.7"
-
 services:
   netdata:
     image: netdata/netdata
     restart: always
-    hostname: netdata.xiupos.net
-    networks:
-      - external_network
+    hostname: sapporo.xiupos.net
+    ports:
+      - "19999:19999"
     volumes:
       - netdataconfig:/etc/netdata
       - netdatalib:/var/lib/netdata
@@ -21,7 +19,3 @@ volumes:
   netdataconfig:
   netdatalib:
   netdatacache:
-
-networks:
-  external_network:
-    external: true
