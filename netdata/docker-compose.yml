@@ -2,7 +2,7 @@ services:
   netdata:
     image: netdata/netdata
     restart: always
-    hostname: sapporo.xiupos.net
+    hostname: sapporo.tail7b2934.ts.net
     ports:
       - "19999:19999"
     networks:
