@@ -15,4 +15,4 @@ services:
       - ./data:/home/node/.n8n
 
 networks:
-  - external_network
+  external_network:
