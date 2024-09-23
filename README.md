@@ -1,4 +1,4 @@
-# Server
+# Server for caddy
 
 ## Install
 
@@ -9,36 +9,28 @@
 
 # # local
 # ssh-keygen -R (server IP)
-# ssh root@stlouis -p 22 # yes
+# ssh root@(the ip address) # yes
 
-## root@stlouis
-adduser ubuntu
-gpasswd -a ubuntu sudo
+## root@tokyo
+adduser xiupos
+gpasswd -a xiupos sudo
 visudo
 
 -   %sudo   ALL=(ALL:ALL) ALL
 +   %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
 
-sudo -iu ubuntu
+sudo -iu xiupos
 
-## ubuntu@stlouis
-mkdir .ssh && chmod 700 .ssh
-touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
-cat <<EOF | tee .ssh/authorized_keys
-(my pub keys)
-EOF
+## xiupos@tokyo
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale login # login to tailscale
+sudo tailscale up --ssh
 
-sudo vim /etc/ssh/sshd_config
--   #Port 22
-+   Port (my port num)
--   PermitRootLogin yes
-+   PermitRootLogin no
--   #PubkeyAuthentication yes
-+   PubkeyAuthentication no
--   #PasswordAuthentication yes
-+   PasswordAuthentication no
+# # now you can connect to ssh with just the command
+# ssh tokyo
 
-sudo service sshd reload
+sudo systemctl stop sshd
+sudo systemctl disable sshd
 
 sudo ufw enable # y
 sudo ufw default deny

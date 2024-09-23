@@ -54,17 +54,3 @@ workflow.xiupos.net {
     import default
   }
 }
-
-tokyo.xiupos.net {
-  import cloudflare
-  reverse_proxy netdata:19999 {
-    import default
-  }
-}
-
-sapporo.xiupos.net {
-  import cloudflare
-  reverse_proxy sapporo:19999 {
-    import default
-  }
-}
