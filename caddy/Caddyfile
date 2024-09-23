@@ -50,7 +50,7 @@ phys.xiupos.net {
 
 workflow.xiupos.net {
   import cloudflare
-  reverse_proxy sapporo:3004 {
+  reverse_proxy sapporo:5678 {
     import default
   }
 }
