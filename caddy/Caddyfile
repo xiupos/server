@@ -21,8 +21,8 @@
   # header_up X-Forwarded-Proto https
 
   # For WebSocket
-  header_up Upgrade {http_upgrade}
-  header_up Connection {connection_upgrade}
+  # header_up Upgrade {http_upgrade}
+  # header_up Connection {connection_upgrade}
 }
 
 mk.xiupos.net {
