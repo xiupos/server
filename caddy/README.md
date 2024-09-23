@@ -20,4 +20,6 @@ docker compose down
 vim Caddyfile
 
 docker compose restart # && docker-compose logs -f
+# # or
+# bash update.sh
 ```
