@@ -3,9 +3,9 @@ Description=Backup server data
 
 [Service]
 Type=simple
-ExecStart=bash /home/ubuntu/server/backup.sh
-User=ubuntu
-Group=ubuntu
+ExecStart=bash /home/xiupos/server/backup.sh
+User=xiupos
+Group=xiupos
 
 [Install]
 WantedBy=multi-user.target
