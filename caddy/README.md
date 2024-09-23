@@ -1,7 +1,7 @@
 ## Install
 
-```
-docker-compose up -d
+```bash
+docker compose up -d
 ```
 
 Token -> See https://github.com/libdns/cloudflare#readme
@@ -9,15 +9,15 @@ Token -> See https://github.com/libdns/cloudflare#readme
 
 ## Uninstall
 
-```
-docker-compose down
+```bash
+docker compose down
 ```
 
 
 ## Update Caddyfile
 
-```
+```bash
 vim Caddyfile
 
-docker-compose restart # && docker-compose logs -f
+docker compose restart # && docker-compose logs -f
 ```
