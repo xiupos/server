@@ -8,7 +8,7 @@ After=plexdrive.service
 [Service]
 Type=simple
 ExecStart=/usr/bin/rclone mount \
-        --config=/home/ubuntu/server/rclone/rclone.conf \
+        --config=/home/xiupos/server/rclone/rclone.conf \
         --allow-other \
         --cache-tmp-upload-path=/tmp/rclone/upload \
         --cache-chunk-path=/tmp/rclone/chunks \
