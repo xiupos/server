@@ -9,7 +9,7 @@
 
 # # local
 # ssh-keygen -R (server IP)
-# ssh root@(the ip address) # yes
+# ssh root@(server IP) # yes
 
 ## root@tokyo
 adduser xiupos
@@ -73,7 +73,7 @@ sudo gpasswd -a xiupos docker
 docker network create external_network
 
 sudo apt-get install -y git
-git clone https://github.com/xiupos/server.git
+git clone https://github.com/xiupos/server.git -b caddy
 
 cp example-docker.env docker.env
 vim docker.env
