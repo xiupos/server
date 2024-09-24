@@ -11,7 +11,7 @@
 # ssh-keygen -R (server IP)
 # ssh root@(server IP) # yes
 
-## root@tokyo
+## root@ishikari
 adduser xiupos
 gpasswd -a xiupos sudo
 visudo
@@ -19,13 +19,13 @@ visudo
 #+   %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
 sudo -iu xiupos
 
-## xiupos@tokyo
+## xiupos@ishikari
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale login # login to tailscale
 sudo tailscale up --ssh
 
 # # now you can connect to ssh with just the command
-# ssh tokyo
+# ssh ishikari
 
 sudo systemctl stop sshd
 sudo systemctl disable sshd

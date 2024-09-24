@@ -1,6 +1,5 @@
 services:
   caddy:
-    # build: .
     image: ghcr.io/caddybuilds/caddy-cloudflare:latest
     restart: always
     networks:
