@@ -39,8 +39,10 @@ mk-dev.xiupos.net {
     reverse_proxy mk-dev-s3.xiupos.net
   }
 
-  reverse_proxy sapporo:3001 {
-    import default
+  handle_path /* {
+    reverse_proxy sapporo:3001 {
+      import default
+    }
   }
 }
 
