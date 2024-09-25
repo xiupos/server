@@ -27,19 +27,22 @@
 
 mk.xiupos.net {
   import cloudflare
-  reverse_proxy sapporo:3000 {
-    import default
+  route {
+    handle /files/* {
+      redir https://mk-s3.xiupos.net{uri}
+    }
+    reverse_proxy sapporo:3000 {
+      import default
+    }
   }
 }
 
 mk-dev.xiupos.net {
   import cloudflare
-
   route {
     handle /files/* {
       redir https://mk-dev-s3.xiupos.net{uri}
     }
-
     reverse_proxy sapporo:3001 {
       import default
     }
@@ -48,21 +51,33 @@ mk-dev.xiupos.net {
 
 m.huling.org {
   import cloudflare
-  reverse_proxy sapporo:3002 {
-    import default
+  route {
+    handle /files/* {
+      redir https://m-s3.huling.org{uri}
+    }
+    reverse_proxy sapporo:3002 {
+      import default
+    }
   }
 }
 
 phys.xiupos.net {
   import cloudflare
-  reverse_proxy sapporo:3003 {
-    import default
+  route {
+    handle /files/* {
+      redir https://phys-s3.xiupos.net{uri}
+    }
+    reverse_proxy sapporo:3003 {
+      import default
+    }
   }
 }
 
 workflow.xiupos.net {
   import cloudflare
-  reverse_proxy sapporo:5678 {
-    import default
+  route {
+    reverse_proxy sapporo:5678 {
+      import default
+    }
   }
 }
