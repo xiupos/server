@@ -20,7 +20,7 @@ services:
     # env_file:
     #   - .config/docker.env
     volumes:
-      - ./data/files:/misskey/files
+      # - ./data/files:/misskey/files
       - ./.config:/misskey/.config:ro
 
   redis:
