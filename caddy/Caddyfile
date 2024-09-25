@@ -34,8 +34,13 @@ mk.xiupos.net {
 
 mk-dev.xiupos.net {
   import cloudflare
+
   reverse_proxy sapporo:3001 {
     import default
+  }
+
+  handle_path /files/* {
+    reverse_proxy mk-dev-s3.xiupos.net
   }
 }
 
