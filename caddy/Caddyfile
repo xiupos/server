@@ -37,7 +37,7 @@ mk-dev.xiupos.net {
 
   route {
     handle /files/* {
-      redir https://mk-dev-s3.xiupos.net/files{uri}
+      redir https://mk-dev-s3.xiupos.net{uri}
     }
 
     reverse_proxy sapporo:3001 {
