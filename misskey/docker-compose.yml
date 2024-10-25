@@ -1,6 +1,7 @@
 services:
   misskey:
-    image: misskey/misskey
+    image: ghcr.io/xiupos/misskey
+    # image: misskey/misskey
     restart: always
     links:
       - db
