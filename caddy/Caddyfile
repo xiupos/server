@@ -61,18 +61,6 @@ m.huling.org {
   }
 }
 
-phys.xiupos.net {
-  import cloudflare
-  route {
-    handle /files/* {
-      redir https://phys-s3.xiupos.net{uri}
-    }
-    reverse_proxy sapporo:3003 {
-      import default
-    }
-  }
-}
-
 workflow.xiupos.net {
   import cloudflare
   route {
