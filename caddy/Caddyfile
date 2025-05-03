@@ -66,7 +66,7 @@ phys.xiupos.net {
 	respond <<HTML
 		<html>
 			<head><title>phys.xiupos.net</title></head>
-			<body>ごめんなさい、phys.xiupos.net は誰も使ってなかったのでサービス終了しました。ご利用ありがとうございました。</body>
+			<body>Sorry, phys.xiupos.net is no longer available. Thank you for using it!</body>
 		</html>
 		HTML 410
 }
