@@ -61,6 +61,16 @@ m.huling.org {
   }
 }
 
+phys.xiupos.net {
+	header Content-Type text/html
+	respond <<HTML
+		<html>
+			<head><title>phys.xiupos.net</title></head>
+			<body>ごめんなさい、phys.xiupos.net は誰も使ってなかったのでサービス終了しました。ご利用ありがとうございました。</body>
+		</html>
+		HTML 410
+}
+
 workflow.xiupos.net {
   import cloudflare
   route {
