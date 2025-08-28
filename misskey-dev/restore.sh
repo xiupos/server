@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=`cd $(dirname ${0}) && pwd`
-source .config/docker.env
+source .config/.docker.env
 
 docker compose -f $DIR/docker-compose.yml down
 sudo rm -rf $DIR/data
