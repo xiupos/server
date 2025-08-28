@@ -16,6 +16,5 @@ docker-compose -f $DIR/docker-compose.yml stop db
 
 # redis
 sudo tar -C $DIR -zxvf $DIR/backup/redis.tar.gz data/redis
-sudo chown -c xiupos:xiupos $DIR/backup/redis.tar.gz
 
 # docker compose -f $DIR/docker-compose.yml up -d
