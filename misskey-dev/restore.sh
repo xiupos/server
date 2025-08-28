@@ -14,6 +14,6 @@ rm $DIR/pgdumpall
 docker-compose -f $DIR/docker-compose.yml stop db
 
 # redis
-sudo tar -C $DIR -zxvf $DIR/backup/redis.tar.gz data/redis
+sudo tar -C $DIR -zxvf $DIR/backup/redis.tar.gz redis
 
 # docker compose -f $DIR/docker-compose.yml up -d
