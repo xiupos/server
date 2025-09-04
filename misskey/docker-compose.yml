@@ -49,6 +49,7 @@ services:
       test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
       interval: 5s
       retries: 20
+    shm_size: "2gb"
 
 #  mcaptcha:
 #    restart: always

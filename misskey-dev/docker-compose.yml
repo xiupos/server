@@ -35,6 +35,7 @@ services:
       test: "redis-cli ping"
       interval: 5s
       retries: 20
+    shm_size: "2gb"
 
   db:
     restart: always
