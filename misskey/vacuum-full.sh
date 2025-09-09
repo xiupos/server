@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=`cd $(dirname ${0}) && pwd`
-source .config/docker.env
+source $DIR/.config/docker.env
 
 docker compose -f $DIR/docker-compose.yml up -d
 docker compose -f $DIR/docker-compose.yml misskey down
