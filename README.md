@@ -79,6 +79,8 @@ sudo k0s kubectl taint node new-machine node-role.kubernetes.io/control-plane-
 
 ## Longhorn
 
+- https://longhorn.io/docs/1.10.1/deploy/install/install-with-helm/
+
 ```sh
 helm repo add longhorn https://charts.longhorn.io
 helm repo update
@@ -86,6 +88,17 @@ helm install longhorn longhorn/longhorn \
   --namespace longhorn-system \
   --create-namespace \
   --set persistence.defaultClass=true \
-  --set defaultSettings.defaultReplicaCount=2 \
-  --set defaultSettings.taintToleration="emergency-only:NoSchedule"
+  --set defaultSettings.defaultReplicaCount=2
+```
+
+## CloudNativePG
+
+- https://cloudnative-pg.io/charts/
+
+```sh
+helm repo add cnpg https://cloudnative-pg.io/charts
+helm repo update
+helm install cnpg cnpg/cloudnative-pg \
+  --namespace cnpg-system \
+  --create-namespace
 ```
