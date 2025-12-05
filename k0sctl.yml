@@ -1,0 +1,55 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: x4s-k0s-cluster
+
+spec:
+  hosts:
+    - # pome-sapporo
+      # 6vCPU + 8GB RAM + 512GB NVMe
+      role: controller+worker
+      ssh:
+        address: 100.121.75.42
+        user: xiupos
+        port: 22
+        keyPath: null
+      privateInterface: tailscale0
+      installFlags:
+        - '--kubelet-extra-args=\"--node-ip=100.121.75.42\"'
+        - --debug
+
+    - # contabo-stlouis
+      # 6vCPU + 8GB RAM + 150GB SSD
+      role: controller+worker
+      ssh:
+        address: 100.109.227.26
+        user: xiupos
+        port: 22
+        keyPath: null
+      privateInterface: tailscale0
+      installFlags:
+        - '--kubelet-extra-args=\"--node-ip=100.109.227.26\"'
+        - --debug
+
+    - # indigo-tokyo
+      # 1vCPU + 1GB RAM + 20GB SSD
+      role: worker
+      ssh:
+        address: 100.114.103.5
+        user: xiupos
+        port: 22
+        keyPath: null
+      privateInterface: tailscale0
+      installFlags:
+        - '--kubelet-extra-args=\"--node-ip=100.114.103.5\"'
+        - --debug
+
+  k0s:
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: Cluster
+      metadata:
+        name: x4s-k0s-cluster
+      spec:
+        api:
+          address: 100.121.75.42

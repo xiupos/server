@@ -14,6 +14,10 @@
 
 # # xiupos@sapporo
 
+sudo visudo
+#-   %sudo   ALL=(ALL:ALL) ALL
+#+   %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale login # login to tailscale
 sudo tailscale up --ssh
@@ -21,8 +25,8 @@ sudo tailscale up --ssh
 # # now you can connect to ssh with just the command
 # ssh sapporo
 
-sudo systemctl stop sshd
-sudo systemctl disable sshd
+sudo systemctl stop ssh ssh.socket
+sudo systemctl disable ssh
 
 sudo ufw enable # y
 sudo ufw default allow
