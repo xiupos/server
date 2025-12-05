@@ -5,51 +5,57 @@ metadata:
 
 spec:
   hosts:
-    - # pome-sapporo
-      # 6vCPU + 8GB RAM + 512GB NVMe
-      role: controller+worker
+    # == indigo-tokyo ==
+    # 2vCPU + 2GB RAM + 40GB SSD
+    - role: controller+worker
       ssh:
-        address: 100.121.75.42
+        address: 100.112.94.41
         user: xiupos
-        port: 22
-        keyPath: null
       privateInterface: tailscale0
       installFlags:
-        - '--kubelet-extra-args=\"--node-ip=100.121.75.42\"'
-        - --debug
+        - --kubelet-extra-args="--fail-swap-on=false"
+        - --labels=ingress-ready=true
+        - --taints=node-role.kubernetes.io/ingress=true:NoSchedule
 
-    - # contabo-stlouis
-      # 6vCPU + 8GB RAM + 150GB SSD
-      role: controller+worker
+    # == contabo-stlouis ==
+    # 6vCPU + 8GB RAM + 150GB SSD
+    - role: controller+worker
       ssh:
         address: 100.109.227.26
         user: xiupos
-        port: 22
-        keyPath: null
       privateInterface: tailscale0
       installFlags:
-        - '--kubelet-extra-args=\"--node-ip=100.109.227.26\"'
-        - --debug
+        - --kubelet-extra-args="--fail-swap-on=false"
+        - --labels=ingress-ready=true,worker-type=general
 
-    - # indigo-tokyo
-      # 1vCPU + 1GB RAM + 20GB SSD
-      role: worker
+    # == pome-sapporo ==
+    # 6vCPU + 8GB RAM + 512GB NVMe
+    - role: controller+worker
       ssh:
-        address: 100.114.103.5
+        address: 100.121.75.42
         user: xiupos
-        port: 22
-        keyPath: null
       privateInterface: tailscale0
       installFlags:
-        - '--kubelet-extra-args=\"--node-ip=100.114.103.5\"'
-        - --debug
+        - --kubelet-extra-args="--fail-swap-on=false"
+        - --labels=worker-type=general
 
   k0s:
+    version: v1.34.2+k0s.0
+    # dynamicConfig: false
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
-      kind: Cluster
+      kind: ClusterConfig
       metadata:
-        name: x4s-k0s-cluster
+        name: tailscale-k0s-cluster
       spec:
         api:
-          address: 100.121.75.42
+          sans:
+            - 100.112.94.41 # indigo-tokyo
+            - 100.109.227.26 # contabo-stlouis
+            - 100.121.75.42 # pome-sapporo
+        network:
+          provider: kuberouter
+          kubeRouter:
+            mtu: 1240
+        telemetry:
+          enabled: false

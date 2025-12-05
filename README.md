@@ -14,7 +14,7 @@
 
 # # xiupos@sapporo
 
-sudo visudo
+sudo EDITOR=vi visudo
 #-   %sudo   ALL=(ALL:ALL) ALL
 #+   %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
 
@@ -28,8 +28,12 @@ sudo tailscale up --ssh
 sudo systemctl stop ssh ssh.socket
 sudo systemctl disable ssh
 
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow in on tailscale0
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
 sudo ufw enable # y
-sudo ufw default allow
 
 sudo apt-get update && sudo apt-get upgrade -y
 
@@ -39,46 +43,28 @@ sudo vim /etc/apt/apt.conf.d/50unattended-upgrades
 #-   //      "${distro_id}:${distro_codename}-updates";
 #+           "${distro_id}:${distro_codename}-updates";
 
+sudo swapoff -a
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# reboot
+
 sudo apt-get install -y open-iscsi nfs-common
 sudo systemctl enable --now iscsid
 ```
 
-## For first machine in cluster
-
-- https://docs.k0sproject.io/stable/k0s-multi-node/
+## Ingress
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://get.k0s.sh | sudo sh
-
-# first machine in cluster
-sudo k0s install controller --enable-worker
-sudo k0s start
-sudo k0s kubectl taint node sapporo-2 node-role.kubernetes.io/control-plane-
-
-# to control from local machine
-sudo k0s kubeconfig admin > ~/config
-vim ~/config
-# rewrite "localhost" (in clusters[0].server) to tailscale ip address
-
-# # local
-# scp sapporo:config ~/.kube/k0s-config
-```
-
-## Add machines to cluster
-
-```sh
-# # sapporo
-# sudo k0s token create --role=controller --expiry=12h > ~/token-file
-
-# # local
-# scp sapporo:token-file new-machine:token-file
-
-# # new-machine
-curl --proto '=https' --tlsv1.2 -sSf https://get.k0s.sh | sudo sh
-
-sudo k0s install controller --enable-worker --token-file ~/token-file
-sudo k0s start
-sudo k0s kubectl taint node new-machine node-role.kubernetes.io/control-plane-
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  -f 01-ingress/ingress-values.yaml \
+  -n ingress-nginx \
+  --create-namespace
 ```
 
 ## Longhorn

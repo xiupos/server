@@ -1,0 +1,23 @@
+controller:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+  ingressClassResource:
+    default: true
+
+  nodeSelector:
+    ingress-ready: "true"
+
+  tolerations:
+    - key: "node-role.kubernetes.io/ingress"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+  kind: DaemonSet
+
+  service:
+    type: ClusterIP
+
+  config:
+    use-forwarded-headers: "true"
+    compute-full-forwarded-for: "true"
