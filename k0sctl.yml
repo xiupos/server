@@ -5,57 +5,43 @@ metadata:
 
 spec:
   hosts:
-    # == indigo-tokyo ==
-    # 2vCPU + 2GB RAM + 40GB SSD
-    - role: controller+worker
-      ssh:
-        address: 100.112.94.41
-        user: xiupos
-      privateInterface: tailscale0
-      installFlags:
-        - --kubelet-extra-args="--fail-swap-on=false"
-        - --labels=ingress-ready=true
-        - --taints=node-role.kubernetes.io/ingress=true:NoSchedule
-
-    # == contabo-stlouis ==
-    # 6vCPU + 8GB RAM + 150GB SSD
-    - role: controller+worker
-      ssh:
-        address: 100.109.227.26
-        user: xiupos
-      privateInterface: tailscale0
-      installFlags:
-        - --kubelet-extra-args="--fail-swap-on=false"
-        - --labels=ingress-ready=true,worker-type=general
-
     # == pome-sapporo ==
     # 6vCPU + 8GB RAM + 512GB NVMe
     - role: controller+worker
       ssh:
-        address: 100.121.75.42
+        address: 100.64.0.0
         user: xiupos
       privateInterface: tailscale0
+      privateAddress: 100.64.0.0
       installFlags:
-        - --kubelet-extra-args="--fail-swap-on=false"
-        - --labels=worker-type=general
+        - --kubelet-extra-args="--fail-swap-on=false --node-ip=100.64.0.0"
+        - --labels=worker-type=app-only
+
+    # == indigo-tokyo ==
+    # 2vCPU + 2GB RAM + 40GB SSD
+    - role: worker
+      ssh:
+        address: 100.64.0.1
+        user: xiupos
+      privateInterface: tailscale0
+      privateAddress: 100.64.0.1
+      installFlags:
+        - --kubelet-extra-args="--fail-swap-on=false --node-ip=100.64.0.1"
+        - --taints=node-role.kubernetes.io/ingress-only=true:NoSchedule
+        - --labels=worker-type=ingress-only
 
   k0s:
     version: v1.34.2+k0s.0
-    # dynamicConfig: false
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
       kind: ClusterConfig
       metadata:
-        name: tailscale-k0s-cluster
+        name: x4s-k0s-cluster
       spec:
         api:
-          sans:
-            - 100.112.94.41 # indigo-tokyo
-            - 100.109.227.26 # contabo-stlouis
-            - 100.121.75.42 # pome-sapporo
+          address: 100.64.0.0 # pome-sapporo
+
         network:
           provider: kuberouter
           kubeRouter:
-            mtu: 1240
-        telemetry:
-          enabled: false
+            mtu: 1280

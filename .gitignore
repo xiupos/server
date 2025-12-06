@@ -9,3 +9,6 @@
 /*/backup
 /*/data
 /docker.env
+
+.envrc
+kubeconfig
