@@ -1,14 +1,14 @@
 ## Install
 
 ```bash
-touch acme.json
-chmod 600 acme.json
+mkdir data
+touch data/acme.json
+chmod 600 data/acme.json
 
 docker compose up -d
 ```
 
 Token -> See https://github.com/libdns/cloudflare#readme
-
 
 ## Uninstall
 
@@ -16,13 +16,12 @@ Token -> See https://github.com/libdns/cloudflare#readme
 docker compose down
 ```
 
-
-## Update Caddyfile
+## Update config files
 
 ```bash
-vim Caddyfile
+git pull
 
-docker compose restart # && docker-compose logs -f
+docker compose up -d --force-recreate
 # # or
 # bash update.sh
 ```

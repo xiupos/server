@@ -1,4 +1,4 @@
-# Server for caddy
+# Server for Reverse Proxy
 
 ## Install
 
@@ -74,7 +74,6 @@ cp example-docker.env docker.env
 vim docker.env # edit constants
 ```
 
-1. [Start Caddy](caddy/README.md)
 1. [Start Traefik](traefik/README.md)
 1. [Start netdata](netdata/README.md)
 1. `bash update-install.sh`
