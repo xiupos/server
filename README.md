@@ -19,8 +19,7 @@ sudo -iu xiupos
 
 ## xiupos@ishikari
 curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale login # login to tailscale
-sudo tailscale up --ssh
+sudo tailscale up --ssh # login to tailscale
 
 # # now you can connect to ssh with just the command
 # ssh ishikari
@@ -60,6 +59,8 @@ sudo gpasswd -a $USER docker
 # sudo apt-get update
 # sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 # sudo gpasswd -a xiupos docker
+
+sudo reboot
 
 ################################
 # Initialize

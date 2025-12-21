@@ -17,14 +17,6 @@ services:
       - ./config:/etc/traefik/config:ro
       - ./data/acme.json:/acme.json
 
-  error-pages:
-    image: nginx:alpine
-    networks:
-      - external_network
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./html:/usr/share/nginx/html:ro
-
 networks:
   external_network:
     external: true

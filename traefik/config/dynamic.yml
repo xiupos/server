@@ -1,68 +1,28 @@
 http:
   routers:
-    mk-router:
-      rule: "Host(`mk.xiupos.net`)"
-      service: mk-service
+    to-worker-http:
+      rule: "HostSNI(`*`)"
+      entryPoints: [web]
+      service: worker-http-svc
+
+    to-worker-https:
+      rule: "HostSNI(`*`)"
       entryPoints: [websecure]
       tls:
-        certResolver: cloudflare
-      middlewares:
-        - mk-files-redirect
-
-    mk-dev-router:
-      rule: "Host(`mk-dev.xiupos.net`)"
-      service: mk-dev-service
-      entryPoints: [websecure]
-      tls:
-        certResolver: cloudflare
-      middlewares:
-        - mk-dev-files-redirect
-
-    workflow-router:
-      rule: "Host(`workflow.xiupos.net`)"
-      service: workflow-service
-      entryPoints: [websecure]
-      tls:
-        certResolver: cloudflare
-
-    # 410 pages
-    gone-pages-router:
-      rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
-      service: error-pages-service
-      entryPoints: [websecure]
-      tls:
-        certResolver: cloudflare
-
-  middlewares:
-    mk-files-redirect:
-      redirectRegex:
-        regex: "^https?://[^/]+/files/(.*)"
-        replacement: "https://mk-s3.xiupos.net/files/${1}"
-        permanent: false
-
-    mk-dev-files-redirect:
-      redirectRegex:
-        regex: "^https?://[^/]+/files/(.*)"
-        replacement: "https://mk-dev-s3.xiupos.net/files/${1}"
-        permanent: false
+        passthrough: true
+      service: worker-https-svc
 
   services:
-    mk-service:
+    worker-http-svc:
       loadBalancer:
         servers:
-          - url: "http://sapporo:3000"
+          - address: "sapporo:80"
+        proxyProtocol:
+          version: 2
 
-    mk-dev-service:
+    worker-https-svc:
       loadBalancer:
         servers:
-          - url: "http://sapporo:3001"
-
-    workflow-service:
-      loadBalancer:
-        servers:
-          - url: "http://sapporo:5678"
-
-    error-pages-service:
-      loadBalancer:
-        servers:
-          - url: "http://error-pages:80"
+          - address: "sapporo:443"
+        proxyProtocol:
+          version: 2
