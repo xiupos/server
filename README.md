@@ -28,7 +28,9 @@ sudo systemctl stop sshd
 sudo systemctl disable sshd
 
 sudo ufw enable # y
-sudo ufw default deny
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow in on tailscale0
 sudo ufw limit 80/tcp comment http
 sudo ufw limit 443/tcp comment https
 
