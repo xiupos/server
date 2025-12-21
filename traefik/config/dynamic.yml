@@ -1,13 +1,13 @@
 http:
   routers:
-    # mk-router:
-    #   rule: "Host(`mk.xiupos.net`)"
-    #   service: mk-service
-    #   entryPoints: [websecure]
-    #   tls:
-    #     certResolver: cloudflare
-    #   middlewares:
-    #     - mk-files-redirect
+    mk-router:
+      rule: "Host(`mk.xiupos.net`)"
+      service: mk-service
+      entryPoints: [websecure]
+      tls:
+        certResolver: cloudflare
+      middlewares:
+        - mk-files-redirect
 
     mk-dev-router:
       rule: "Host(`mk-dev.xiupos.net`)"
@@ -25,7 +25,7 @@ http:
       tls:
         certResolver: cloudflare
 
-    # 410
+    # 410 pages
     gone-pages-router:
       rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
       service: error-pages-service
@@ -34,11 +34,11 @@ http:
         certResolver: cloudflare
 
   middlewares:
-    # mk-files-redirect:
-    #   redirectRegex:
-    #     regex: "^https?://[^/]+/files/(.*)"
-    #     replacement: "https://mk-s3.xiupos.net/files/${1}"
-    #     permanent: false # redir (302) に相当。301なら true
+    mk-files-redirect:
+      redirectRegex:
+        regex: "^https?://[^/]+/files/(.*)"
+        replacement: "https://mk-s3.xiupos.net/files/${1}"
+        permanent: false
 
     mk-dev-files-redirect:
       redirectRegex:
@@ -47,10 +47,10 @@ http:
         permanent: false
 
   services:
-    # mk-service:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://sapporo:3000"
+    mk-service:
+      loadBalancer:
+        servers:
+          - url: "http://sapporo:3000"
 
     mk-dev-service:
       loadBalancer:
