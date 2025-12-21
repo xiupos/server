@@ -26,12 +26,12 @@ http:
         certResolver: cloudflare
 
     # 410
-    # gone-pages-router:
-    #   rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
-    #   service: error-pages-service
-    #   entryPoints: [websecure]
-    #   tls:
-    #     certResolver: cloudflare
+    gone-pages-router:
+      rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
+      service: error-pages-service
+      entryPoints: [websecure]
+      tls:
+        certResolver: cloudflare
 
   middlewares:
     # mk-files-redirect:
@@ -62,7 +62,7 @@ http:
         servers:
           - url: "http://sapporo:5678"
 
-    # error-pages-service:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://error-pages:80"
+    error-pages-service:
+      loadBalancer:
+        servers:
+          - url: "http://error-pages:80"
