@@ -8,6 +8,10 @@ api:
 entryPoints:
   web:
     address: ":80"
+    proxyProtocol:
+      trustedIPs:
+        - "100.64.0.0/10" # Tailscale IPv4
+        - "fd7a:115c:a1e0::/48" # Tailscale IPv6
     http:
       redirections:
         entryPoint:
@@ -15,6 +19,10 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+    proxyProtocol:
+      trustedIPs:
+        - "100.64.0.0/10" # Tailscale IPv4
+        - "fd7a:115c:a1e0::/48" # Tailscale IPv6
     http3: {}
 
 providers:
