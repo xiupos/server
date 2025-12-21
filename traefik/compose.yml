@@ -1,5 +1,5 @@
 services:
-  caddy:
+  traefik:
     image: traefik:latest
     restart: always
     networks:
