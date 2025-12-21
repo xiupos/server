@@ -1,4 +1,4 @@
-http:
+tcp:
   routers:
     to-worker-http:
       rule: "HostSNI(`*`)"
