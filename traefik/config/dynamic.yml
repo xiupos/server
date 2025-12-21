@@ -4,7 +4,8 @@ http:
     #   rule: "Host(`mk.xiupos.net`)"
     #   service: mk-service
     #   entryPoints: [websecure]
-    #   certResolver: cloudflare
+    #   tls:
+    #     certResolver: cloudflare
     #   middlewares:
     #     - mk-files-redirect
 
@@ -12,7 +13,8 @@ http:
       rule: "Host(`mk-dev.xiupos.net`)"
       service: mk-dev-service
       entryPoints: [websecure]
-      certResolver: cloudflare
+      tls:
+        certResolver: cloudflare
       middlewares:
         - mk-dev-files-redirect
 
@@ -20,14 +22,17 @@ http:
     #   rule: "Host(`workflow.xiupos.net`)"
     #   service: workflow-service
     #   entryPoints: [websecure]
-    #   certResolver: cloudflare
+    #   tls:
+    #     certResolver: cloudflare
 
     # 410
     # gone-pages-router:
     #   rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
     #   service: error-pages-service
     #   entryPoints: [websecure]
-    #   certResolver: cloudflare
+    #   tls:
+    #     certResolver: cloudflare
+
   middlewares:
     # mk-files-redirect:
     #   redirectRegex:
