@@ -1,0 +1,30 @@
+services:
+  caddy:
+    image: traefik:latest
+    restart: always
+    networks:
+      - external_network
+    ports:
+      - "80:80"
+      - "443:443/tcp"
+      - "443:443/udp"
+      - "8080:8080"
+    env_file:
+      - ../docker.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./config:/etc/traefik/config:ro
+      - ./acme.json:/acme.json
+
+  # error-pages:
+  #   image: nginx:alpine
+  #   networks:
+  #     - external_network
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - ./html:/usr/share/nginx/html:ro
+
+networks:
+  external_network:
+    external: true

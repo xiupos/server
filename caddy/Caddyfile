@@ -37,17 +37,17 @@ mk.xiupos.net {
   }
 }
 
-mk-dev.xiupos.net {
-  import cloudflare
-  route {
-    handle /files/* {
-      redir https://mk-dev-s3.xiupos.net{uri}
-    }
-    reverse_proxy sapporo:3001 {
-      import default
-    }
-  }
-}
+# mk-dev.xiupos.net {
+#   import cloudflare
+#   route {
+#     handle /files/* {
+#       redir https://mk-dev-s3.xiupos.net{uri}
+#     }
+#     reverse_proxy sapporo:3001 {
+#       import default
+#     }
+#   }
+# }
 
 m.huling.org {
 	header Content-Type text/html

@@ -1,0 +1,11 @@
+/.vscode
+!/.vscode/extensions.json
+/.idea
+*.pem
+*.log
+*.code-workspace
+.DS_Store
+
+/data
+docker.env
+acme.json
