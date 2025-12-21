@@ -25,7 +25,7 @@ providers:
 certificatesResolvers:
   cloudflare:
     acme:
-      email: "${ACME_EMAIL}"
+      # email: # defined by TRAEFIK_CERTIFICATESRESOLVERS_CLOUDFLARE_ACME_EMAIL
       storage: "/acme.json"
       dnsChallenge:
         provider: cloudflare
