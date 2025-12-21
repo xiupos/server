@@ -12,6 +12,7 @@ entryPoints:
       trustedIPs:
         - "100.64.0.0/10" # Tailscale IPv4
         - "fd7a:115c:a1e0::/48" # Tailscale IPv6
+        - "172.16.0.0/12" # Docker Internal Network
     http:
       redirections:
         entryPoint:
@@ -23,6 +24,7 @@ entryPoints:
       trustedIPs:
         - "100.64.0.0/10" # Tailscale IPv4
         - "fd7a:115c:a1e0::/48" # Tailscale IPv6
+        - "172.16.0.0/12" # Docker Internal Network
     http3: {}
 
 providers:
