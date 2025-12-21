@@ -5,8 +5,8 @@ services:
     networks:
       - external_network
     depends_on:
-      dns-wait:
-        condition: service_completed_successfully
+      dns-monitor:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443/tcp"
@@ -19,17 +19,18 @@ services:
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./config:/etc/traefik/config:ro
 
-  dns-wait:
+  dns-monitor:
     image: busybox:latest
+    restart: always
     networks:
       - external_network
-    command: >
-      sh -c "
-      echo 'Waiting for MagicDNS (sapporo)...';
-      until nslookup sapporo > /dev/null 2>&1; do
-        sleep 1;
-      done;
-      echo 'DNS Ready!';"
+    command: tail -f /dev/null
+    healthcheck:
+      test: ["CMD-SHELL", "nslookup sapporo > /dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 1s
 
 networks:
   external_network:
