@@ -16,13 +16,13 @@ tcp:
     worker-http-svc:
       loadBalancer:
         servers:
-          - address: "sapporo:80"
+          - address: "100.124.201.50:80"
         proxyProtocol:
           version: 2
 
     worker-https-svc:
       loadBalancer:
         servers:
-          - address: "sapporo:443"
+          - address: "100.124.201.50:443"
         proxyProtocol:
           version: 2

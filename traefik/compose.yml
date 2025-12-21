@@ -4,9 +4,6 @@ services:
     restart: always
     networks:
       - external_network
-    depends_on:
-      dns-monitor:
-        condition: service_healthy
     ports:
       - "80:80"
       - "443:443/tcp"
@@ -18,19 +15,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./config:/etc/traefik/config:ro
-
-  dns-monitor:
-    image: busybox:latest
-    restart: always
-    networks:
-      - external_network
-    command: tail -f /dev/null
-    healthcheck:
-      test: ["CMD-SHELL", "nslookup sapporo > /dev/null 2>&1 || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 1s
 
 networks:
   external_network:
