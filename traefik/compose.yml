@@ -4,6 +4,9 @@ services:
     restart: always
     networks:
       - external_network
+    depends_on:
+      dns-wait:
+        condition: service_completed_successfully
     ports:
       - "80:80"
       - "443:443/tcp"
@@ -15,6 +18,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
       - ./config:/etc/traefik/config:ro
+
+  dns-wait:
+    image: busybox:latest
+    networks:
+      - external_network
+    command: >
+      sh -c "
+      echo 'Waiting for MagicDNS (sapporo)...';
+      until nslookup sapporo > /dev/null 2>&1; do
+        sleep 1;
+      done;
+      echo 'DNS Ready!';"
 
 networks:
   external_network:
