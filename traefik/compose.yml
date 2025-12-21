@@ -14,7 +14,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./config:/etc/traefik/config:ro
+      - ./dynamic.yml:/etc/traefik/dynamic.yml:ro
       - ./acme.json:/acme.json
 
   # error-pages:
