@@ -1,5 +1,5 @@
 services:
-  n8n:
+  workflow:
     image: docker.n8n.io/n8nio/n8n:next
     restart: always
     hostname: workflow.xiupos.net
