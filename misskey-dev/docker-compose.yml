@@ -1,5 +1,5 @@
 services:
-  misskey:
+  misskey-dev:
     # image: ghcr.io/xiupos/misskey
     image: misskey/misskey
     restart: always
