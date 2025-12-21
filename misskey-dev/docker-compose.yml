@@ -13,8 +13,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    ports:
-      - "3001:80"
     networks:
       - internal_network
       - external_network
@@ -98,3 +96,4 @@ networks:
   internal_network:
     internal: true
   external_network:
+    external: true

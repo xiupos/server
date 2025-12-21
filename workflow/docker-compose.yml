@@ -3,8 +3,6 @@ services:
     image: docker.n8n.io/n8nio/n8n:next
     restart: always
     hostname: workflow.xiupos.net
-    ports:
-      - "5678:5678"
     networks:
       - external_network
     environment:
@@ -16,3 +14,4 @@ services:
 
 networks:
   external_network:
+    external: true
