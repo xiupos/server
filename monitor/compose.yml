@@ -1,0 +1,43 @@
+services:
+  # grafana:
+  #   image: grafana/grafana
+  #   restart: always
+  #   networks:
+  #     - internal_network
+  #     - external_network
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+  #     - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #     - GF_SERVER_ROOT_URL=https://status.xiupos.net
+  #     - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/node-exporter.json
+  #     - GF_LOG_MODE=console
+  #     - GF_UNIFIED_ALERTING_SCREENSHOTS_CAPTURE=false
+  #   volumes:
+  #     - ./grafana/provisioning:/etc/grafana/provisioning
+  #     - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    network_mode: host
+    networks:
+      - internal_network
+    environment:
+      - GOGC=50
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=3GB
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+volumes:
+  prometheus_data:
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+    external: true
