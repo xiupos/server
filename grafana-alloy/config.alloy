@@ -25,7 +25,7 @@ prometheus.exporter.unix "host" {
 
 prometheus.scrape "host" {
   targets    = prometheus.exporter.unix.host.targets
-  forward_to = [prometheus.remote_write.default.receiver]
+  forward_to = [prometheus.remote_write.metrics_hosted_prometheus.receiver]
 
   scrape_interval = "60s"
 
