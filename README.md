@@ -46,21 +46,35 @@ sudo sed -i 's|//\s*\("\${distro_id}:\${distro_codename}-updates";\)|\1|' /etc/a
 ################################
 
 sudo apt-get update
-sudo apt-get install ca-certificates
+sudo apt-get install -y ca-certificates
 sudo install -m 0755 -d /etc/apt/keyrings
 
 # ubuntu
-sudo snap install docker
-sudo addgroup --system docker
-sudo gpasswd -a $USER docker
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
 
 # # debian
 # sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
 # sudo chmod a+r /etc/apt/keyrings/docker.asc
-# echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-# sudo apt-get update
-# sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-# sudo gpasswd -a xiupos docker
+# sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+# Types: deb
+# URIs: https://download.docker.com/linux/debian
+# Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+# Components: stable
+# Signed-By: /etc/apt/keyrings/docker.asc
+# EOF
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo addgroup --system docker
+sudo gpasswd -a $USER docker
 
 sudo reboot
 

@@ -14,7 +14,7 @@ services:
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      # - /:/rootfs:ro,rslave
+      - /:/rootfs:ro,rslave
 
   cadvisor:
     image: ghcr.io/google/cadvisor
@@ -27,7 +27,7 @@ services:
     devices:
       - /dev/kmsg
     volumes:
-      # - /:/rootfs:ro,rslave
+      - /:/rootfs:ro,rslave
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/snap/docker/common/var-lib-docker:/var/lib/docker:ro
