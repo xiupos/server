@@ -20,7 +20,6 @@ services:
   prometheus:
     image: prom/prometheus
     restart: always
-    network_mode: host
     networks:
       - internal_network
     environment:
