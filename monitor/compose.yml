@@ -22,6 +22,9 @@ services:
     restart: always
     networks:
       - internal_network
+      - external_network
+    ports:
+      - 9090:9090
     environment:
       - GOGC=50
     command:
