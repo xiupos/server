@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: senates-node
+    static_configs:
+      - targets:
+          - tokyo:9100 # node-exporter
+        labels:
+          group: senates
+
+  - job_name: senates-container
+    static_configs:
+      - targets:
+          - tokyo:8000 # cadvisor
+        labels:
+          group: senates
+
+  - job_name: workers-node
+    static_configs:
+      - targets:
+          - sapporo:9100 # node-exporter
+        labels:
+          group: workers
+
+  - job_name: workers-container
+    static_configs:
+      - targets:
+          - sapporo:8000 # cadvisor
+        labels:
+          group: workers
