@@ -6,6 +6,8 @@ services:
       - --path.rootfs=/host
     ports:
       - 9100:9100
+    networks:
+      - external_network
     pid: host
     volumes:
       - /:/host:ro,rslave
@@ -15,6 +17,8 @@ services:
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - external_network
     privileged: true
     devices:
       - /dev/kmsg
@@ -22,7 +26,7 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+      # - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
 
 networks:
