@@ -3,6 +3,8 @@ services:
     image: grafana/alloy
     restart: always
     network_mode: host
+    env_file:
+      - ../docker.env
     environment:
       - ROOTFS_PATH=/rootfs
       - SYS_PATH=/host/sys
