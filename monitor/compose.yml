@@ -20,9 +20,7 @@ services:
   prometheus:
     image: prom/prometheus
     restart: always
-    networks:
-      - internal_network
-      - external_network
+    network_mode: host
     ports:
       - 9090:9090
     environment:
@@ -38,8 +36,8 @@ services:
 volumes:
   prometheus_data:
 
-networks:
-  internal_network:
-    internal: true
-  external_network:
-    external: true
+# networks:
+#   internal_network:
+#     internal: true
+#   external_network:
+#     external: true

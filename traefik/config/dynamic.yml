@@ -3,24 +3,24 @@ tcp:
     to-worker-http:
       rule: "HostSNI(`*`)"
       entryPoints: [web]
-      service: worker-http-svc
+      service: worker-http-service
 
     to-worker-https:
       rule: "HostSNI(`*`)"
       entryPoints: [websecure]
       tls:
         passthrough: true
-      service: worker-https-svc
+      service: worker-https-service
 
   services:
-    worker-http-svc:
+    worker-http-service:
       loadBalancer:
         servers:
           - address: "100.124.201.50:80"
         proxyProtocol:
           version: 2
 
-    worker-https-svc:
+    worker-https-service:
       loadBalancer:
         servers:
           - address: "100.124.201.50:443"
