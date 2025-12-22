@@ -1,0 +1,37 @@
+// metrics
+prometheus.remote_write "metrics_hosted_prometheus" {
+  endpoint {
+    name = "hosted-prometheus"
+    url = sys.env("GF_PROMETHEUS_URL")
+
+    basic_auth {
+      username = sys.env("GF_PROMETHEUS_USERNAME")
+      password = sys.env("GF_PROMETHEUS_API_KEY")
+    }
+  }
+}
+
+prometheus.exporter.unix "host" {
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+  rootfs_path = "/rootfs"
+
+  disable_collectors = ["wifi", "hwmon", "zfs", "btrfs", "xfs", "timex", "powersupply"]
+
+  filesystem {
+    mount_points_exclude = "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($|/)"
+  }
+}
+
+prometheus.scrape "host" {
+  targets    = prometheus.exporter.unix.host.targets
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  scrape_interval = "60s"
+
+  global_relabel_config {
+    source_labels = ["__address__"]
+    target_label  = "instance"
+    replacement   = sys.env("HOSTNAME")
+  }
+}
