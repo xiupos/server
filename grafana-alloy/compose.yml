@@ -1,0 +1,17 @@
+services:
+  alloy:
+    image: grafana/alloy
+    restart: always
+    network_mode: host
+    env_file:
+      - ../docker.env
+    environment:
+      - ROOTFS_PATH=/rootfs
+      - SYS_PATH=/host/sys
+      - PROC_PATH=/host/proc
+    volumes:
+      - /:/rootfs:ro,rslave
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config.alloy:/etc/alloy/config.alloy:ro
