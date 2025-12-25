@@ -2,8 +2,6 @@ services:
   traefik:
     image: traefik:latest
     restart: always
-    links:
-      - error-pages
     networks:
       - external_network
     ports:
