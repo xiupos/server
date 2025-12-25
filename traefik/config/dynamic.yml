@@ -25,14 +25,6 @@ http:
       tls:
         certResolver: cloudflare
 
-    # 410 pages
-    gone-pages-router:
-      rule: "Host(`m.huling.org`) || Host(`phys.xiupos.net`)"
-      service: error-pages-service
-      entryPoints: [websecure]
-      tls:
-        certResolver: cloudflare
-
   middlewares:
     mk-files-redirect:
       redirectRegex:
@@ -61,8 +53,3 @@ http:
       loadBalancer:
         servers:
           - url: "http://workflow:5678"
-
-    error-pages-service:
-      loadBalancer:
-        servers:
-          - url: "http://error-pages:80"
