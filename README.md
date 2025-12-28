@@ -61,6 +61,6 @@ kubectl apply -f base/infrastructure/networking/cloudflare.yml
 ### Ingress (Traefik)
 
 ```sh
-kubectl apply -f k8s/secrets.yml
-kubectl apply -f k8s/00-infra/traefik-config.yml
+kubectl apply -f secrets.yml
+kubectl apply -f base/infrastructure/networking/traefik-config.yml
 ```
