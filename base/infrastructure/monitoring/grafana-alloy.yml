@@ -10,6 +10,7 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: grafana-alloy
+  namespace: kube-system
 spec:
   chart: alloy
   repo: https://grafana.github.io/helm-charts
