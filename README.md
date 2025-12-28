@@ -50,6 +50,12 @@ cp k8s/example-secrets.yml k8s/secrets.yml
 # edit secrets.yml
 ```
 
+### Ingress (Traefik)
+
+```sh
+kubectl apply -f base/infrastructure/networking/traefik-config.yml
+```
+
 ### Cloudflare Tunnel
 
 ```sh

@@ -92,13 +92,3 @@ spec:
     additionalArguments:
       - --entryPoints.web.forwardedHeaders.insecure
       - --entryPoints.web.proxyProtocol.insecure
-
-    logs:
-      general:
-        level: INFO
-      access:
-        enabled: true
-
-    service:
-      enabled: true
-      type: ClusterIP
