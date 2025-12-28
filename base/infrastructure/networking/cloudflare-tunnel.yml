@@ -90,8 +90,8 @@ spec:
 
     # for cloudflare tunnel
     additionalArguments:
-      - "--entryPoints.web.forwardedHeaders.insecure"
-      - "--entryPoints.web.proxyProtocol.insecure"
+      - --entryPoints.web.forwardedHeaders.insecure
+      - --entryPoints.web.proxyProtocol.insecure
 
     logs:
       general:
