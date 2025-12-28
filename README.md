@@ -64,3 +64,11 @@ kubectl apply -f base/infrastructure/networking/cloudflare.yml
 kubectl apply -f secrets.yml
 kubectl apply -f base/infrastructure/networking/traefik-config.yml
 ```
+
+### Grafana Alloy
+
+```sh
+kubectl create ns grafana-alloy
+kubectl apply -f secrets.yml
+kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
+```
