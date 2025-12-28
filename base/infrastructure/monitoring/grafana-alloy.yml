@@ -15,6 +15,7 @@ spec:
   repo: https://grafana.github.io/helm-charts
   targetNamespace: grafana-alloy
   valuesContent: |- #yaml
+
     # https://github.com/grafana/alloy/master/operations/helm/charts/alloy/README.md
     alloy:
       mount:
