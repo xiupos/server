@@ -61,7 +61,7 @@ kubectl apply -f base/infrastructure/networking/traefik-config.yml
 ```sh
 kubectl create ns cloudflare
 kubectl apply -f secrets.yml
-kubectl apply -f base/infrastructure/networking/cloudflare.yml
+kubectl apply -f base/infrastructure/networking/cloudflare-tunnel.yml
 ```
 
 ### Grafana Alloy
@@ -70,4 +70,12 @@ kubectl apply -f base/infrastructure/networking/cloudflare.yml
 kubectl create ns grafana-alloy
 kubectl apply -f secrets.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
+```
+
+### Misskey (mk-dev-k8s.xiupos.net)
+
+```sh
+kubectl create ns misskey-mk-dev-k8s-xiupos-net
+kubectl apply -f secrets.yml
+kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
 ```
