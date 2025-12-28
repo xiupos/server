@@ -1,97 +1,30 @@
 # Server
 
-## Install
+## Initialise Server
 
-```bash
-################################
-# Initialize Server
-################################
-
+```sh
 # # local
-# ssh-keygen -R (server IP)
-# ssh root@(server IP) # yes
+# ssh-keygen -R (server IP or hostname e.g. p-pleb-jp)
+# ssh root@(worker hostname) # yes
 
-## root@sapporo
-adduser xiupos
-gpasswd -a xiupos sudo
+# # root@(worker hostname) (if there is no non-root user)
+# adduser xiupos
+# gpasswd -a xiupos sudo
+# sudo -iu xiupos
+
+# # xiupos@(worker hostname)
+
 echo '%sudo ALL=(ALL:ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers
-sudo -iu xiupos
 
-## xiupos@sapporo
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up --ssh # login to tailscale
 
 # # now you can connect to ssh with just the command
-# ssh sapporo
-
-sudo systemctl stop sshd
-sudo systemctl disable sshd
-
-sudo ufw enable # y
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow in on tailscale0
-sudo ufw limit 80/tcp comment http
-sudo ufw limit 443/tcp comment https
-
-sudo apt-get update && sudo apt-get upgrade -y
-
-sudo apt-get install -y unattended-upgrades debconf-utils
-echo "unattended-upgrades unattended-upgrades/enable_auto_updates boolean true" | sudo debconf-set-selections
-sudo dpkg-reconfigure -f noninteractive unattended-upgrades
-sudo sed -i 's|//\s*\("\${distro_id}:\${distro_codename}-updates";\)|\1|' /etc/apt/apt.conf.d/50unattended-upgrades
-
-################################
-# Install Docker
-################################
-
-sudo apt-get update
-sudo apt-get install -y ca-certificates
-sudo install -m 0755 -d /etc/apt/keyrings
-
-# ubuntu
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-
-# # debian
-# sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-# sudo chmod a+r /etc/apt/keyrings/docker.asc
-# sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-# Types: deb
-# URIs: https://download.docker.com/linux/debian
-# Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
-# Components: stable
-# Signed-By: /etc/apt/keyrings/docker.asc
-# EOF
-
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo addgroup --system docker
-sudo gpasswd -a $USER docker
-
-sudo reboot
-
-################################
-# Initialize
-################################
-
-docker network create external_network
-
-sudo apt install -y git
-git clone https://github.com/xiupos/server.git
-
-cp example-docker.env docker.env
-vim docker.env
+# ssh (worker hostname)
 ```
 
-1. [Start RCLONE](rclone/README.md)
-1. [Start Traefik](traefik/README.md)
-1. Prepare backup files
-1. `bash restore.sh`
+## Ansible
+
+```sh
+ansible-playbook -i ansible/hosts.yml ansible/site.yml
+```

@@ -1,0 +1,61 @@
+- name: Ensure kubernetes python library is installed
+  ansible.builtin.apt:
+    name: python3-kubernetes
+    state: present
+    update_cache: true
+
+- name: Create argocd namespace
+  kubernetes.core.k8s:
+    name: argocd
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: "{{ k3s_kubeconfig }}"
+
+- name: Apply ArgoCD Manifests
+  kubernetes.core.k8s:
+    src: "{{ argocd_install_url }}"
+    state: present
+    namespace: argocd
+    kubeconfig: "{{ k3s_kubeconfig }}"
+
+- name: Patch argocd-server service to type LoadBalancer
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: argocd-server
+        namespace: argocd
+      spec:
+        type: LoadBalancer
+    state: present
+    kubeconfig: "{{ k3s_kubeconfig }}"
+
+- name: Wait for argocd-server to be ready
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: argocd
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+    kubeconfig: "{{ k3s_kubeconfig }}"
+  register: argocd_pod_list
+  until: argocd_pod_list.resources | length > 0 and (argocd_pod_list.resources[0].status.phase == 'Running')
+  retries: 10
+  delay: 10
+
+- name: Get ArgoCD initial admin password
+  ansible.builtin.shell: |
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: argocd_password
+  changed_when: false
+
+- name: Display ArgoCD Admin Password
+  ansible.builtin.debug:
+    msg:
+      - "ArgoCD Installation Complete!"
+      - "URL: https://{{ ansible_default_ipv4.address }}"
+      - "User: admin"
+      - "Password: {{ argocd_password.stdout }}"

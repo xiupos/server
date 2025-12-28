@@ -9,3 +9,10 @@
 /*/backup
 /*/data
 /docker.env
+
+.envrc
+kubeconfig
+secrets.yml
+
+*.retry
+.ansible/

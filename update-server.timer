@@ -1,8 +1,0 @@
-[Unit]
-Description=Backup server data
-
-[Timer]
-OnCalendar=weekly
-
-[Install]
-WantedBy=timers.target
