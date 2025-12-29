@@ -67,6 +67,12 @@ kubectl apply -f base/secrets/grafana-alloy.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
 ```
 
+### CloudNative PG
+
+```sh
+kubectl apply -f base/infrastructure/databases/cnpg-system.yml
+```
+
 ### Misskey (mk-dev-k8s.xiupos.net)
 
 ```sh
