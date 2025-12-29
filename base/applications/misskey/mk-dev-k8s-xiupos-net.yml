@@ -1,0 +1,183 @@
+# namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: misskey-mk-dev-k8s-xiupos-net
+
+---
+# postgresql
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: misskey-mk-dev-k8s-xiupos-net-db
+spec:
+  chart: postgresql
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: misskey-mk-dev-k8s-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md
+
+    fullnameOverride: db
+    primary:
+      resourcesPreset: medium
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 20Gi
+    auth:
+      database: misskey
+      username: example-misskey-user
+      postgresPassword: example-misskey-pass
+      password: example-misskey-pass
+    shmVolume:
+      sizeLimit: 2Gi
+
+---
+# redis
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: misskey-mk-dev-k8s-xiupos-net-redis
+spec:
+  chart: redis
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: misskey-mk-dev-k8s-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md
+
+    fullnameOverride: redis
+    architecture: standalone
+    master:
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 1Gi
+    auth:
+      enabled: false
+
+---
+# config for misskey (default.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: misskey-config
+  namespace: misskey-mk-dev-k8s-xiupos-net
+data:
+  default.yml: | #yaml
+    # https://github.com/misskey-dev/misskey/blob/develop/.config/example.yml
+    url: https://mk-dev-k8s.xiupos.net/
+    port: 3000
+
+    db:
+      host: db
+      port: 5432
+      db: misskey
+      user: example-misskey-user
+      pass: example-misskey-pass
+      extra:
+        statement_timeout: 0
+
+    redis:
+      host: redis-master
+      port: 6379
+
+    # FOR DEV SERVER
+    proxy: http://127.0.0.1:3128
+
+    proxyBypassHosts:
+      - api.deepl.com
+      - api-free.deepl.com
+      - www.recaptcha.net
+      - hcaptcha.com
+      - challenges.cloudflare.com
+
+    id: 'aid'
+
+    signToActivityPubGet: true
+
+---
+# misskey
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: misskey
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: misskey
+  template:
+    metadata:
+      labels:
+        app: misskey
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1
+          command: ["sh", "-c"]
+          args:
+            - | #sh
+              until nc -z -v -w 2 db 5432; do sleep 2; done
+              until nc -z -v -w 2 redis-master 6379; do sleep 2; done
+
+      containers:
+        - name: misskey
+          image: misskey/misskey:latest
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: config
+              mountPath: /misskey/.config/default.yml
+              subPath: default.yml
+
+      volumes:
+        - name: config
+          configMap:
+            name: misskey-config
+
+---
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: misskey
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  selector:
+    app: misskey
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+---
+# s3 redirect for old files
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-files
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  redirectRegex:
+    regex: "^https?://[^/]+/files/(.*)"
+    replacement: https://mk-dev-k8s-s3.xiupos.net/files/${1}
+    permanent: false
+
+---
+# ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: misskey-ingress
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`mk-dev-k8s.xiupos.net`)
+      kind: Rule
+      middlewares:
+        - name: redirect-files
+      services:
+        - name: misskey
+          port: 3000
