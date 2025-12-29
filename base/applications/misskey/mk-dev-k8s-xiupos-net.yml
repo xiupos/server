@@ -5,32 +5,36 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net
 
 ---
-# postgresql
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
+# set password for postgresql db
+# https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret
+apiVersion: v1
+kind: Secret
 metadata:
-  name: misskey-mk-dev-k8s-xiupos-net-db
-spec:
-  chart: postgresql
-  repo: https://charts.bitnami.com/bitnami
-  targetNamespace: misskey-mk-dev-k8s-xiupos-net
-  valuesContent: |- #yaml
-    # https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md
+  name: db-pass
+  namespace: misskey-mk-dev-k8s-xiupos-net
+type: kubernetes.io/basic-auth
+stringData:
+  username: example-misskey-user
+  password: example-misskey-pass
 
-    fullnameOverride: db
-    primary:
-      resourcesPreset: medium
-      persistence:
-        enabled: true
-        storageClass: local-path
-        size: 20Gi
-    auth:
+---
+# postgresql
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: db
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  instances: 1
+  bootstrap:
+    initdb:
       database: misskey
-      username: example-misskey-user
-      postgresPassword: example-misskey-pass
-      password: example-misskey-pass
-    shmVolume:
-      sizeLimit: 2Gi
+      owner: example-misskey-user
+      secret:
+        name: db-pass
+  storage:
+    size: 20Gi
+    storageClass: local-path
 
 ---
 # redis
@@ -69,7 +73,7 @@ data:
     port: 3000
 
     db:
-      host: db
+      host: db-rw
       port: 5432
       db: misskey
       user: example-misskey-user
@@ -118,7 +122,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - | #sh
-              until nc -z -v -w 2 db 5432; do sleep 2; done
+              until nc -z -v -w 2 db-rw 5432; do sleep 2; done
               until nc -z -v -w 2 redis-master 6379; do sleep 2; done
 
       containers:

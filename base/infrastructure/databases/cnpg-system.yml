@@ -1,0 +1,19 @@
+# namespace for cloudnative pg controller
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cnpg-system
+
+---
+# cloudnative-pg
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cnpg
+  namespace: kube-system
+spec:
+  chart: cloudnative-pg
+  repo: https://cloudnative-pg.github.io/charts
+  targetNamespace: cnpg-system
+  valuesContent: |- #yaml
+    # https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md
