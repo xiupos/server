@@ -144,6 +144,11 @@ spec:
             - name: config
               mountPath: /misskey/.config/default.yml
               subPath: default.yml
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTP
 
       volumes:
         - name: config
