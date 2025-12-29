@@ -85,7 +85,6 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |- #yaml
-
     # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/VALUES.md
 
     # for cloudflare tunnel
