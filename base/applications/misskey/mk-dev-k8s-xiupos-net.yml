@@ -81,6 +81,16 @@ data:
       extra:
         statement_timeout: 0
 
+    # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#postgresql-replication
+    # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
+    dbReplications: true
+    dbSlaves:
+      - host: db-ro
+        port: 5432
+        db: misskey
+        user: example-misskey-user
+        pass: example-misskey-pass
+
     redis:
       host: redis-master
       port: 6379
