@@ -45,10 +45,7 @@ sed -i "s/127.0.0.1/$HOSTNAME/" config
 
 ### Set secrets
 
-```sh
-cp k8s/example-secrets.yml k8s/secrets.yml
-# edit secrets.yml
-```
+- edit `base/secrets`
 
 ### Ingress (Traefik)
 
@@ -59,23 +56,19 @@ kubectl apply -f base/infrastructure/networking/traefik-config.yml
 ### Cloudflare Tunnel
 
 ```sh
-kubectl create ns cloudflare
-kubectl apply -f secrets.yml
+kubectl apply -f base/secrets/cloudflare-tunnel.yml
 kubectl apply -f base/infrastructure/networking/cloudflare-tunnel.yml
 ```
 
 ### Grafana Alloy
 
 ```sh
-kubectl create ns grafana-alloy
-kubectl apply -f secrets.yml
+kubectl apply -f base/secrets/grafana-alloy.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
 ```
 
 ### Misskey (mk-dev-k8s.xiupos.net)
 
 ```sh
-kubectl create ns misskey-mk-dev-k8s-xiupos-net
-kubectl apply -f secrets.yml
 kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
 ```
