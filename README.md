@@ -45,7 +45,7 @@ sed -i "s/127.0.0.1/$HOSTNAME/" config
 
 ### Set secrets
 
-- edit `base/secrets`
+- edit `base/secrets/*-example.yml`
 
 ### Ingress (Traefik)
 
@@ -70,6 +70,7 @@ kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
 ### CloudNative PG
 
 ```sh
+kubectl apply -f base/secrets/cnpg-system.yml
 kubectl apply -f base/infrastructure/databases/cnpg-system.yml
 ```
 

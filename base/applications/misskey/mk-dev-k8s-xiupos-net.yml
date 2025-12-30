@@ -18,6 +18,40 @@ stringData:
   password: example-misskey-pass
 
 ---
+# copy secrets "r2-creds" from cnpg-system
+apiVersion: v1
+kind: Secret
+metadata:
+  name: r2-creds
+  namespace: misskey-mk-dev-k8s-xiupos-net
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflects: "cnpg-system/r2-creds"
+type: Opaque
+data: {}
+
+---
+# Object Storage for backup of postgresql
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: db-backup-objectstore
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  retentionPolicy: 7d
+  configuration:
+    destinationPath: s3://p-backup/misskey-mk-dev-k8s-xiupos-net/
+    endpointURL: https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com
+    s3Credentials:
+      accessKeyId:
+        name: r2-creds
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: r2-creds
+        key: SECRET_ACCESS_KEY
+    wal:
+      compression: gzip
+
+---
 # postgresql
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -35,6 +69,27 @@ spec:
   storage:
     size: 20Gi
     storageClass: local-path
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: db-backup-objectstore
+
+---
+# backup postgresql
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: db-backup
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  cluster:
+    name: db
+  schedule: "0 */30 * * * *"
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
 
 ---
 # redis
