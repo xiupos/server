@@ -85,7 +85,7 @@ data:
     # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
     dbReplications: true
     dbSlaves:
-      - host: db-ro
+      - host: db-r
         port: 5432
         db: misskey
         user: example-misskey-user
@@ -133,6 +133,7 @@ spec:
           args:
             - | #sh
               until nc -z -v -w 2 db-rw 5432; do sleep 2; done
+              until nc -z -v -w 2 db-r 5432; do sleep 2; done
               until nc -z -v -w 2 redis-master 6379; do sleep 2; done
 
       containers:
