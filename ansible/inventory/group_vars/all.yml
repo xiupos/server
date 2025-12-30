@@ -1,0 +1,28 @@
+ansible_user: xiupos
+
+k3s_version: v1.35.0+k3s1
+k3s_kubeconfig: /etc/rancher/k3s/k3s.yaml
+systemd_dir: /etc/systemd/system
+cluster_init: true
+
+token: "token-{{ region }}"
+api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+
+extra_server_args: >-
+  --disable-cloud-controller
+  --node-name {{ inventory_hostname }}
+  --node-ip {{ ansible_host }}
+  --node-label topology.kubernetes.io/region={{ region }}
+  --node-external-ip {{ ansible_host }}
+  --flannel-iface tailscale0
+  --tls-san {{ ansible_host }}
+  --tls-san {{ inventory_hostname }}
+
+extra_agent_args: >-
+  --node-name {{ inventory_hostname }}
+  --node-ip {{ ansible_host }}
+  --node-label topology.kubernetes.io/region={{ region }}
+  --node-external-ip {{ ansible_host }}
+  --flannel-iface tailscale0
+
+argocd_install_url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml

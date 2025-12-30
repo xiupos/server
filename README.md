@@ -26,56 +26,54 @@ sudo tailscale up --ssh # login to tailscale
 ## Ansible
 
 ```sh
-ansible-playbook -i ansible/hosts.yml ansible/site.yml
+# jp
+ansible-playbook -i ansible/inventory/hosts-jp.yml ansible/site.yml
+
+# us
+ansible-playbook -i ansible/inventory/hosts-us.yml ansible/site.yml
+
+# eu
+ansible-playbook -i ansible/inventory/hosts-eu.yml ansible/site.yml
 ```
 
-## K3s
-
-```sh
-# # xiupos@(server hostname)
-sudo cat /etc/rancher/k3s/k3s.yaml > config
-sed -i "s/127.0.0.1/$HOSTNAME/" config
-
-# # local
-# cp ~/.kube/config ~/.kube/config.old
-# scp (server hostname):config ~/.kube/config
-
-# now you can use `kubectl` from local
-```
-
-### Set secrets
+## Set secrets
 
 - edit `base/secrets/*-example.yml`
 
-### Ingress (Traefik)
+## Setup k3s cluster
 
 ```sh
-kubectl apply -f base/infrastructure/networking/traefik-config.yml
+# jp
+alias kubectl="kubectl --kubeconfig ~/.kube/config-p-home-sapporo"
+
+# us
+alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-stlouis"
+
+# eu
+alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-nuremberg"
 ```
 
-### Cloudflare Tunnel
-
 ```sh
+# Ingress (Traefik)
+kubectl apply -f base/infrastructure/networking/traefik-config.yml
+
+# Cloudflare Tunnel
 kubectl apply -f base/secrets/cloudflare-tunnel.yml
 kubectl apply -f base/infrastructure/networking/cloudflare-tunnel.yml
-```
 
-### Grafana Alloy
-
-```sh
+# Grafana Alloy
 kubectl apply -f base/secrets/grafana-alloy.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
-```
 
-### CloudNative PG
-
-```sh
+# CloudNative PG
 kubectl apply -f base/secrets/cnpg-system.yml
 kubectl apply -f base/infrastructure/databases/cnpg-system.yml
+
+# Misskey (mk-dev-k8s.xiupos.net)
+kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
 ```
 
-### Misskey (mk-dev-k8s.xiupos.net)
-
 ```sh
-kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
+# unalias kubectl
+functions --erase kubectl
 ```

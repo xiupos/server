@@ -1,0 +1,14 @@
+all:
+  children:
+    k3s_cluster:
+      vars:
+        region: us-central-1
+        timezone: America/Chicago
+      children:
+        server:
+          hosts:
+            p-contabo-stlouis:
+              ansible_host: 100.64.1.0
+              node_id: us-01
+        # agent:
+        #   hosts:

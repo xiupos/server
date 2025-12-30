@@ -1,0 +1,14 @@
+all:
+  children:
+    k3s_cluster:
+      vars:
+        region: eu-central-1
+        timezone: Europe/Berlin
+      children:
+        server:
+          hosts:
+            p-contabo-nuremberg:
+              ansible_host: 100.64.2.0
+              node_id: eu-01
+        # agent:
+        #   hosts:

@@ -24,6 +24,20 @@
     - { direction: incoming, policy: deny }
     - { direction: outgoing, policy: allow }
 
+- name: Allow Loopback Interface
+  community.general.ufw:
+    rule: allow
+    interface: lo
+    direction: in
+    comment: "Allow local traffic"
+
+- name: Allow Loopback Interface (outgoing)
+  community.general.ufw:
+    rule: allow
+    interface: lo
+    direction: out
+    comment: "Allow local traffic"
+
 - name: Allow Tailscale Interface (inbound)
   community.general.ufw:
     rule: allow
