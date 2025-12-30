@@ -4,14 +4,17 @@
   roles:
     - common
 
-- name: Install K3s
+- name: Install k3s
   ansible.builtin.import_playbook: k3s.orchestration.site
 
-# - name: Install ArgoCD
-#   hosts: server
-#   become: true
-#   roles:
-#     - argocd
+- name: Post-install security tasks for k3s
+  hosts: all
+  become: true
+  tasks:
+    - name: Close unsafe k8s ports on public interface
+      ansible.builtin.import_role:
+        name: common
+        tasks_from: close-k8s-ports
 
 - name: Fetch and modify k3s config
   hosts: server
@@ -30,3 +33,9 @@
         mode: "0600"
       delegate_to: localhost
       become: false
+
+# - name: Install ArgoCD
+#   hosts: server
+#   become: true
+#   roles:
+#     - argocd

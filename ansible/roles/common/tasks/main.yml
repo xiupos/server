@@ -23,26 +23,28 @@
   loop:
     - { direction: incoming, policy: deny }
     - { direction: outgoing, policy: allow }
+  notify: Reload UFW
 
 - name: Allow Loopback Interface
   community.general.ufw:
     rule: allow
     interface: lo
     direction: in
-    comment: "Allow local traffic"
+  notify: Reload UFW
 
 - name: Allow Loopback Interface (outgoing)
   community.general.ufw:
     rule: allow
     interface: lo
     direction: out
-    comment: "Allow local traffic"
+  notify: Reload UFW
 
 - name: Allow Tailscale Interface (inbound)
   community.general.ufw:
     rule: allow
     interface: tailscale0
     direction: in
+  notify: Reload UFW
 
 - name: Enable UFW
   community.general.ufw:
