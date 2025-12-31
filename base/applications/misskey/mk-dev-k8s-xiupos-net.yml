@@ -98,25 +98,46 @@ spec:
     name: barman-cloud.cloudnative-pg.io
 
 ---
-# redis
+# valkey 1 (persistent; for job queue)
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: misskey-mk-dev-k8s-xiupos-net-redis
+  name: misskey-mk-dev-k8s-xiupos-net-valkey-persistent
 spec:
-  chart: redis
+  chart: valkey
   repo: https://charts.bitnami.com/bitnami
   targetNamespace: misskey-mk-dev-k8s-xiupos-net
   valuesContent: |- #yaml
-    # https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md
+    # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
 
-    fullnameOverride: redis
+    fullnameOverride: valkey-persistent
     architecture: standalone
     master:
       persistence:
         enabled: true
         storageClass: local-path
         size: 1Gi
+    auth:
+      enabled: false
+
+---
+# valkey 2 (ephemeral; for cache/pubsub)
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: misskey-mk-dev-k8s-xiupos-net-valkey-ephemeral
+spec:
+  chart: valkey
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: misskey-mk-dev-k8s-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
+
+    fullnameOverride: valkey-ephemeral
+    architecture: standalone
+    master:
+      persistence:
+        enabled: false
     auth:
       enabled: false
 
@@ -151,12 +172,27 @@ data:
         db: misskey
         user: example-misskey-user
         pass: example-misskey-pass
+        extra:
+          statement_timeout: 0
 
+    # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#role-based-redis-partitioning
     redis:
-      host: redis-master
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForPubsub:
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForJobQueue:
+      host: valkey-persistent-primary
+      port: 6379
+    redisForTimelines:
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForReactions:
+      host: valkey-ephemeral-primary
       port: 6379
 
-    # FOR DEV SERVER
+    # DEV: NO FEDERATION
     proxy: http://127.0.0.1:3128
 
     proxyBypassHosts:
@@ -165,6 +201,14 @@ data:
       - www.recaptcha.net
       - hcaptcha.com
       - challenges.cloudflare.com
+
+    trustProxy:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 127.0.0.1/32
+      - ::1/128
+      - fc00::/7
 
     id: 'aid'
 
@@ -178,7 +222,7 @@ metadata:
   name: misskey
   namespace: misskey-mk-dev-k8s-xiupos-net
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: misskey
@@ -195,7 +239,8 @@ spec:
             - | #sh
               until nc -vz -w 2 db-rw 5432; do sleep 2; done
               until nc -vz -w 2 db-ro 5432; do sleep 2; done
-              until nc -vz -w 2 redis-master 6379; do sleep 2; done
+              until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
+              until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
 
       containers:
         - name: misskey
