@@ -1,0 +1,31 @@
+---
+# namespace for cloudnative pg controller
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres-operator
+
+---
+# cloudnative-pg
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: pgo
+  namespace: kube-system
+spec:
+  chart: oci://registry.developers.crunchydata.com/crunchydata/pgo
+  # version:
+  targetNamespace: postgres-operator
+
+---
+# reflector
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: reflector
+  namespace: kube-system
+spec:
+  chart: reflector
+  repo: https://emberstack.github.io/helm-charts
+  version: "9.1.45"
+  targetNamespace: kube-system

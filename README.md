@@ -43,14 +43,17 @@ ansible-playbook -i ansible/inventory/hosts-eu.yml ansible/site.yml
 ## Setup k3s cluster
 
 ```sh
-# jp
-alias kubectl="kubectl --kubeconfig ~/.kube/config-p-home-sapporo"
+# set jp as default
+cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube/config
 
-# us
-alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-stlouis"
+# # jp
+# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-home-sapporo"
 
-# eu
-alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-nuremberg"
+# # us
+# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-stlouis"
+
+# # eu
+# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-nuremberg"
 ```
 
 ```sh
@@ -65,15 +68,15 @@ kubectl apply -f base/infrastructure/networking/cloudflare-tunnel.yml
 kubectl apply -f base/secrets/grafana-alloy.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
 
-# CloudNative PG
-kubectl apply -f base/secrets/cnpg-system.yml
-kubectl apply -f base/infrastructure/databases/cnpg-system.yml
+# PostgreSQL Operator (Crunchy Data PGO)
+kubectl apply -f base/secrets/postgres-operator.yml
+kubectl apply -f base/infrastructure/databases/postgres-operator.yml
 
 # Misskey (mk-dev-k8s.xiupos.net)
 kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
 ```
 
 ```sh
-# unalias kubectl
-functions --erase kubectl
+# # unalias kubectl
+# functions --erase kubectl
 ```
