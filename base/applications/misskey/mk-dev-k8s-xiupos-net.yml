@@ -5,20 +5,7 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net
 
 ---
-# set password for postgresql db
-# https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: db-pass
-  namespace: misskey-mk-dev-k8s-xiupos-net
-type: kubernetes.io/basic-auth
-stringData:
-  username: example-misskey-user
-  password: example-misskey-pass
-
----
-# copy secrets "r2-creds" from cnpg-system
+# object storage for backup of postgresql
 apiVersion: v1
 kind: Secret
 metadata:
@@ -28,9 +15,8 @@ metadata:
     reflector.v1.k8s.emberstack.com/reflects: "cnpg-system/r2-creds"
 type: Opaque
 data: {}
-
 ---
-# Object Storage for backup of postgresql
+# https://cloudnative-pg.io/plugin-barman-cloud/docs/intro/
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
@@ -48,35 +34,55 @@ spec:
       secretAccessKey:
         name: r2-creds
         key: SECRET_ACCESS_KEY
+    data:
+      compression: gzip
     wal:
       compression: gzip
 
 ---
 # postgresql
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-pass
+  namespace: misskey-mk-dev-k8s-xiupos-net
+type: kubernetes.io/basic-auth
+stringData:
+  username: example-misskey-user
+  password: example-misskey-pass
+---
+# https://cloudnative-pg.io/docs/
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: db
   namespace: misskey-mk-dev-k8s-xiupos-net
 spec:
-  instances: 1
+  instances: 2
+  storage:
+    size: 20Gi
+    storageClass: local-path
   bootstrap:
     initdb:
       database: misskey
       owner: example-misskey-user
       secret:
         name: db-pass
-  storage:
-    size: 20Gi
-    storageClass: local-path
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
         barmanObjectName: db-backup-objectstore
+  externalClusters:
+    - name: db-backup
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: db-backup-objectstore
+          serverName: db
 
 ---
-# backup postgresql
+# schedule backup for postgresql
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
@@ -85,7 +91,7 @@ metadata:
 spec:
   cluster:
     name: db
-  schedule: "0 */30 * * * *"
+  schedule: "0 30 * * * *"
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:
@@ -140,7 +146,7 @@ data:
     # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
     dbReplications: true
     dbSlaves:
-      - host: db-r
+      - host: db-ro
         port: 5432
         db: misskey
         user: example-misskey-user
@@ -187,9 +193,9 @@ spec:
           command: ["sh", "-c"]
           args:
             - | #sh
-              until nc -z -v -w 2 db-rw 5432; do sleep 2; done
-              until nc -z -v -w 2 db-r 5432; do sleep 2; done
-              until nc -z -v -w 2 redis-master 6379; do sleep 2; done
+              until nc -vz -w 2 db-rw 5432; do sleep 2; done
+              until nc -vz -w 2 db-ro 5432; do sleep 2; done
+              until nc -vz -w 2 redis-master 6379; do sleep 2; done
 
       containers:
         - name: misskey
@@ -210,9 +216,7 @@ spec:
         - name: config
           configMap:
             name: misskey-config
-
 ---
-# service
 apiVersion: v1
 kind: Service
 metadata:
