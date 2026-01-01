@@ -1,0 +1,22 @@
+# namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: grafana-k8s-monitoring
+
+---
+# grafana k8s monitoring
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: grafana-k8s-monitoring
+  namespace: kube-system
+spec:
+  chart: k8s-monitoring
+  repo: https://grafana.github.io/helm-charts
+  targetNamespace: grafana-k8s-monitoring
+  valuesContent: |- #yaml
+    # https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring
+
+    # Get values from
+    # https://xiupos.grafana.net/a/grafana-k8s-app/configuration/cluster-config
