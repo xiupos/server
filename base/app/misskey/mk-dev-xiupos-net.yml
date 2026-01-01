@@ -1,0 +1,341 @@
+# namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: misskey-mk-dev-xiupos-net
+
+---
+# postgresql
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-pass
+  namespace: misskey-mk-dev-xiupos-net
+type: kubernetes.io/basic-auth
+stringData:
+  username: example-misskey-user
+  password: example-misskey-pass
+---
+# https://cloudnative-pg.io/docs/
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: db
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  storage:
+    size: 20Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: misskey
+      owner: example-misskey-user
+      secret:
+        name: db-pass
+
+---
+# set r2 secrets for backup
+apiVersion: v1
+kind: Secret
+metadata:
+  name: r2-creds
+  namespace: misskey-mk-dev-xiupos-net
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflects: "postgres-operator/r2-creds"
+type: Opaque
+data: {}
+
+# =============== COMMENT OUT FOLLOWING WHEN RESTORING ===============
+
+---
+# schedule backup of postgresql
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup-worker
+              image: postgres:18-alpine
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
+              command: ["/bin/sh", "-c"]
+              args:
+                - | #sh
+                  set -e
+                  apk add --no-cache aws-cli
+
+                  TIMESTAMP=$(date +%H)
+                  FILENAME="pgdump_${NAMESPACE}_${TIMESTAMP}.sql.gz"
+
+                  echo "[INFO] Starting backup: ${FILENAME}"
+                  export PGPASSWORD="${DB_PASS}"
+                  pg_dump -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  if [ ! -f "/tmp/${FILENAME}" ]; then
+                    echo "[ERROR] Dump file not found!"
+                    exit 1
+                  fi
+
+                  echo "[INFO] Uploading to s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME} ..."
+                  aws s3 cp "/tmp/${FILENAME}" "s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME}" \
+                    --endpoint-url "$S3_ENDPOINT" \
+                    --no-progress
+                  echo "[INFO] Backup completed successfully."
+
+              envFrom:
+                - secretRef:
+                    name: r2-creds
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-pass
+                      key: username
+                - name: DB_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-pass
+                      key: password
+
+                - name: S3_ENDPOINT
+                  value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com"
+                - name: BUCKET_NAME
+                  value: "p-backup"
+                - name: DB_HOST
+                  value: "db-rw"
+                - name: DB_PORT
+                  value: "5432"
+                - name: DB_NAME
+                  value: "misskey"
+
+---
+# valkey 1 (persistent; for job queue)
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: misskey-mk-dev-xiupos-net-valkey-persistent
+spec:
+  chart: valkey
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: misskey-mk-dev-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
+
+    fullnameOverride: valkey-persistent
+    architecture: standalone
+    master:
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 1Gi
+    auth:
+      enabled: false
+
+---
+# valkey 2 (ephemeral; for cache/pubsub)
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: misskey-mk-dev-xiupos-net-valkey-ephemeral
+spec:
+  chart: valkey
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: misskey-mk-dev-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
+
+    fullnameOverride: valkey-ephemeral
+    architecture: standalone
+    master:
+      persistence:
+        enabled: false
+    auth:
+      enabled: false
+
+---
+# config for misskey (default.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: misskey-config
+  namespace: misskey-mk-dev-xiupos-net
+data:
+  default.yml: | #yaml
+    # https://github.com/misskey-dev/misskey/blob/develop/.config/example.yml
+
+    url: https://mk-dev.xiupos.net/
+    port: 3000
+
+    db:
+      host: db-rw
+      port: 5432
+      db: misskey
+      user: example-misskey-user
+      pass: example-misskey-pass
+      extra:
+        statement_timeout: 0
+
+    # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#postgresql-replication
+    # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
+    dbReplications: true
+    dbSlaves:
+      - host: db-ro
+        port: 5432
+        db: misskey
+        user: example-misskey-user
+        pass: example-misskey-pass
+        extra:
+          statement_timeout: 0
+
+    # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#role-based-redis-partitioning
+    redis:
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForPubsub:
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForJobQueue:
+      host: valkey-persistent-primary
+      port: 6379
+    redisForTimelines:
+      host: valkey-ephemeral-primary
+      port: 6379
+    redisForReactions:
+      host: valkey-ephemeral-primary
+      port: 6379
+
+    # DEV: NO FEDERATION
+    proxy: http://127.0.0.1:3128
+
+    proxyBypassHosts:
+      - api.deepl.com
+      - api-free.deepl.com
+      - www.recaptcha.net
+      - hcaptcha.com
+      - challenges.cloudflare.com
+
+    trustProxy:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 127.0.0.1/32
+      - ::1/128
+      - fc00::/7
+
+    id: 'aid'
+
+    signToActivityPubGet: true
+
+---
+# misskey
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: misskey
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: misskey
+  template:
+    metadata:
+      labels:
+        app: misskey
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1
+          command: ["sh", "-c"]
+          args:
+            - | #sh
+              until nc -vz -w 2 db-rw 5432; do sleep 2; done
+              until nc -vz -w 2 db-ro 5432; do sleep 2; done
+              until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
+              until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
+
+      containers:
+        - name: misskey
+          image: misskey/misskey:latest
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: config
+              mountPath: /misskey/.config/default.yml
+              subPath: default.yml
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTP
+
+      volumes:
+        - name: config
+          configMap:
+            name: misskey-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: misskey
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  selector:
+    app: misskey
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+---
+# s3 redirect for old files
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-files
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  redirectRegex:
+    regex: "^https?://[^/]+/files/(.*)"
+    replacement: https://mk-dev-s3.xiupos.net/files/${1}
+    permanent: false
+
+---
+# ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: misskey-ingress
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`mk-dev.xiupos.net`)
+      kind: Rule
+      middlewares:
+        - name: redirect-files
+      services:
+        - name: misskey
+          port: 3000
