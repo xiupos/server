@@ -57,7 +57,7 @@ metadata:
   name: db-backup
   namespace: misskey-mk-xiupos-net
 spec:
-  schedule: "0 * * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
@@ -83,8 +83,8 @@ spec:
                   set -e
                   apk add --no-cache aws-cli
 
-                  TIMESTAMP=$(date +%H)
-                  FILENAME="pgdump_${NAMESPACE}_${TIMESTAMP}.sql.gz"
+                  # TIMESTAMP=$(date +%H)
+                  FILENAME="pgdump_${NAMESPACE}.sql.gz"
 
                   echo "[INFO] Starting backup: ${FILENAME}"
                   export PGPASSWORD="${DB_PASS}"
