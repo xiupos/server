@@ -67,9 +67,9 @@ kubectl apply -f base/infra/net/traefik-config.yml
 kubectl apply -f base/secrets/cloudflare-tunnel-shared.yml
 kubectl apply -f base/infra/net/cloudflare-tunnel-shared.yml
 
-# Cloudflare Tunnel (jp)
-kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
-kubectl apply -f base/infra/net/cloudflare-tunnel-jp.yml
+# # Cloudflare Tunnel (jp only)
+# kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
+# kubectl apply -f base/infra/net/cloudflare-tunnel-jp.yml
 
 # Grafana Alloy
 kubectl apply -f base/secrets/grafana-alloy.yml
@@ -79,7 +79,7 @@ kubectl apply -f base/infra/monitor/grafana-alloy.yml
 kubectl apply -f base/secrets/postgres-operator.yml
 kubectl apply -f base/infra/db/postgres-operator.yml
 
-# Misskey (mk-dev-k8s.xiupos.net)
+# Misskey (mk-dev-k8s.xiupos.net; jp only)
 kubectl apply -f base/app/misskey/mk-dev-k8s-xiupos-net.yml
 ```
 
