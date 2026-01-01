@@ -58,29 +58,29 @@ cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube
 
 ```sh
 # common
-kubectl apply -f base/infrastructure/common/utils.yml
+kubectl apply -f base/infra/common/utils.yml
 
 # Ingress (Traefik)
-kubectl apply -f base/infrastructure/networking/traefik-config.yml
+kubectl apply -f base/infra/net/traefik-config.yml
 
 # Cloudflare Tunnel (shared)
 kubectl apply -f base/secrets/cloudflare-tunnel-shared.yml
-kubectl apply -f base/infrastructure/networking/cloudflare-tunnel-shared.yml
+kubectl apply -f base/infra/net/cloudflare-tunnel-shared.yml
 
 # Cloudflare Tunnel (jp)
 kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
-kubectl apply -f base/infrastructure/networking/cloudflare-tunnel-jp.yml
+kubectl apply -f base/infra/net/cloudflare-tunnel-jp.yml
 
 # Grafana Alloy
 kubectl apply -f base/secrets/grafana-alloy.yml
-kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
+kubectl apply -f base/infra/monitor/grafana-alloy.yml
 
 # PostgreSQL Operator (CloudNativePG)
 kubectl apply -f base/secrets/postgres-operator.yml
-kubectl apply -f base/infrastructure/databases/postgres-operator.yml
+kubectl apply -f base/infra/db/postgres-operator.yml
 
 # Misskey (mk-dev-k8s.xiupos.net)
-kubectl apply -f base/applications/misskey/mk-dev-k8s-xiupos-net.yml
+kubectl apply -f base/app/misskey/mk-dev-k8s-xiupos-net.yml
 ```
 
 ```sh
