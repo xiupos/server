@@ -7,7 +7,7 @@ source $DIR/.config/docker.env
 mkdir -p $DIR/backup
 
 # postgresql
-docker-compose -f $DIR/docker-compose.yml exec -T db \
+docker compose -f $DIR/docker-compose.yml exec -T db \
   pg_dumpall -U $POSTGRES_USER | gzip -c > $DIR/backup/pgdumpall.gz
 
 # redis
