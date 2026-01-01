@@ -23,11 +23,18 @@ metadata:
   name: db
   namespace: misskey-mk-xiupos-net
 spec:
-  instances: 3
+  instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:18
   storage:
     size: 20Gi
     storageClass: local-path
+  resources:
+    requests:
+      cpu: 500m
+      memory: 256Mi
+    limits:
+      cpu: 2000m
+      memory: 1Gi
   bootstrap:
     initdb:
       database: misskey
@@ -72,11 +79,11 @@ spec:
               imagePullPolicy: IfNotPresent
               resources:
                 requests:
-                  cpu: "100m"
-                  memory: "128Mi"
+                  cpu: 100m
+                  memory: 128Mi
                 limits:
-                  cpu: "500m"
-                  memory: "512Mi"
+                  cpu: 500m
+                  memory: 512Mi
               command: ["/bin/sh", "-c"]
               args:
                 - | #sh
@@ -150,6 +157,13 @@ spec:
         enabled: true
         storageClass: local-path
         size: 1Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
     auth:
       enabled: false
 
@@ -171,6 +185,13 @@ spec:
     master:
       persistence:
         enabled: false
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
     auth:
       enabled: false
 
@@ -201,7 +222,7 @@ data:
     # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
     dbReplications: true
     dbSlaves:
-      - host: db-ro
+      - host: db-r
         port: 5432
         db: misskey
         user: example-misskey-user
@@ -253,7 +274,12 @@ metadata:
   name: misskey
   namespace: misskey-mk-xiupos-net
 spec:
-  replicas: 2
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: misskey
@@ -269,7 +295,7 @@ spec:
           args:
             - | #sh
               until nc -vz -w 2 db-rw 5432; do sleep 2; done
-              until nc -vz -w 2 db-ro 5432; do sleep 2; done
+              until nc -vz -w 2 db-r 5432; do sleep 2; done
               until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
               until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
 
@@ -282,11 +308,26 @@ spec:
             - name: config
               mountPath: /misskey/.config/default.yml
               subPath: default.yml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1500m
+              memory: 1Gi
           readinessProbe:
             httpGet:
               path: /healthz
               port: 3000
               scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 20
 
       volumes:
         - name: config
