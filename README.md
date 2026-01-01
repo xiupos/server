@@ -78,10 +78,10 @@ kubectl apply -f base/infra/net/cloudflare-tunnel-shared.yml
 # kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
 # kubectl apply -f base/infra/net/cloudflare-tunnel-jp.yml
 
-# # Grafana K8s Monitoring
-# cp base/infra/monitor/grafana-k8s-monitoring-example.yml base/infra/monitor/grafana-k8s-monitoring.yml
-# # edit base/infra/monitor/grafana-k8s-monitoring.yml
-# kubectl apply -f base/infra/monitor/grafana-k8s-monitoring.yml
+# Grafana K8s Monitoring
+cp base/infra/monitor/grafana-k8s-monitoring-example.yml base/infra/monitor/grafana-k8s-monitoring.yml
+# edit base/infra/monitor/grafana-k8s-monitoring.yml
+kubectl apply -f base/infra/monitor/grafana-k8s-monitoring.yml
 
 # PostgreSQL Operator (CloudNativePG)
 kubectl apply -f base/secrets/postgres-operator.yml
