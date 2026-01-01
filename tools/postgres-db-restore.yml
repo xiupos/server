@@ -30,6 +30,7 @@ spec:
 
               echo "[INFO] Starting restore from s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME} ..."
               export PGPASSWORD="${DB_PASS}"
+              until nc -vz -w 2 $DB_HOST $DB_PORT; do sleep 2; done
               aws s3 cp "s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME}" - \
                 --endpoint-url "$S3_ENDPOINT" \
                 --no-progress \
