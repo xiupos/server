@@ -17,86 +17,34 @@ type: Opaque
 data: {}
 
 ---
-# set password for postgres db user
-# https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials/basic-setup/user-management#creating-a-declarative-password-for-a-new-user
+# postgresql
 apiVersion: v1
 kind: Secret
 metadata:
-  name: db-pguser-example-misskey-user # <clusterName>-pguser-<userName>
+  name: db-pass
   namespace: misskey-mk-dev-k8s-xiupos-net
-  labels:
-    postgres-operator.crunchydata.com/cluster: db
-    postgres-operator.crunchydata.com/pguser: example-misskey-user
-type: Opaque
+type: kubernetes.io/basic-auth
 stringData:
+  username: example-misskey-user
   password: example-misskey-pass
-
 ---
-# postgresql
-# https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials
-apiVersion: postgres-operator.crunchydata.com/v1beta1
-kind: PostgresCluster
+# https://cloudnative-pg.io/docs/
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
 metadata:
   name: db
   namespace: misskey-mk-dev-k8s-xiupos-net
 spec:
-  postgresVersion: 18
-  patroni:
-    dynamicConfiguration:
-      postgresql:
-        parameters:
-          archive_timeout: 300
-  instances:
-    - name: instance1
-      replicas: 3
-      dataVolumeClaimSpec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 20Gi
-        storageClassName: local-path
-  users:
-    - name: example-misskey-user
-      databases:
-        - misskey
-      options: "SUPERUSER"
-
-  # dataSource: # FOR RESTORE
-  backups: # FOR BACKUP
-    pgbackrest:
-      configuration:
-        - secret:
-            name: r2-creds
-      global:
-        repo1-path: /misskey-mk-dev-k8s-xiupos-net
-        repo1-s3-uri-style: path
-        repo1-bundle: "y"
-        repo1-bundle-limit: 100MiB
-        repo1-s3-part-size: 64MiB
-        repo1-retention-full: "3"
-        repo1-retention-full-type: count
-        compress-type: zst
-        compress-level: "3"
-
-      # # ============ FOR RESTORE ============
-      # repo:
-      #   name: repo1
-      #   s3:
-      #     bucket: p-backup
-      #     endpoint: ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com
-      #     region: auto
-
-      # ============ FOR BACKUP ============
-      repos:
-        - name: repo1
-          s3:
-            bucket: p-backup
-            endpoint: ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com
-            region: auto
-          schedules:
-            full: "0 5 * * *"
-            incremental: "0 * * * *"
+  instances: 3
+  storage:
+    size: 20Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: misskey
+      owner: example-misskey-user
+      secret:
+        name: db-pass
 
 ---
 # valkey 1 (persistent; for job queue)
@@ -106,7 +54,7 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net-valkey-persistent
 spec:
   chart: valkey
-  repo: https://charts.bitnami.com/bitnami
+  repo: https://valkey.io/valkey-helm/
   targetNamespace: misskey-mk-dev-k8s-xiupos-net
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
@@ -129,7 +77,7 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net-valkey-ephemeral
 spec:
   chart: valkey
-  repo: https://charts.bitnami.com/bitnami
+  repo: https://valkey.io/valkey-helm/
   targetNamespace: misskey-mk-dev-k8s-xiupos-net
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
@@ -156,21 +104,19 @@ data:
     port: 3000
 
     db:
-      host: db-primary
+      host: db-rw
       port: 5432
       db: misskey
       user: example-misskey-user
       pass: example-misskey-pass
       extra:
-        ssl:
-          rejectUnauthorized: false
         statement_timeout: 0
 
     # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#postgresql-replication
     # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
     dbReplications: true
     dbSlaves:
-      - host: db-replicas
+      - host: db-ro
         port: 5432
         db: misskey
         user: example-misskey-user
@@ -240,8 +186,8 @@ spec:
           command: ["sh", "-c"]
           args:
             - | #sh
-              until nc -vz -w 2 db-primary 5432; do sleep 2; done
-              until nc -vz -w 2 db-replicas 5432; do sleep 2; done
+              until nc -vz -w 2 db-rw 5432; do sleep 2; done
+              until nc -vz -w 2 db-ro 5432; do sleep 2; done
               until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
               until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
 

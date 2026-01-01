@@ -57,6 +57,9 @@ cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube
 ```
 
 ```sh
+# common
+kubectl apply -f base/infrastructure/common/utils.yml
+
 # Ingress (Traefik)
 kubectl apply -f base/infrastructure/networking/traefik-config.yml
 
@@ -72,7 +75,7 @@ kubectl apply -f base/infrastructure/networking/cloudflare-tunnel-jp.yml
 kubectl apply -f base/secrets/grafana-alloy.yml
 kubectl apply -f base/infrastructure/monitoring/grafana-alloy.yml
 
-# PostgreSQL Operator (Crunchy Data PGO)
+# PostgreSQL Operator (CloudNativePG)
 kubectl apply -f base/secrets/postgres-operator.yml
 kubectl apply -f base/infrastructure/databases/postgres-operator.yml
 
