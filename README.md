@@ -60,9 +60,13 @@ cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube
 # Ingress (Traefik)
 kubectl apply -f base/infrastructure/networking/traefik-config.yml
 
-# Cloudflare Tunnel
-kubectl apply -f base/secrets/cloudflare-tunnel.yml
-kubectl apply -f base/infrastructure/networking/cloudflare-tunnel.yml
+# Cloudflare Tunnel (shared)
+kubectl apply -f base/secrets/cloudflare-tunnel-shared.yml
+kubectl apply -f base/infrastructure/networking/cloudflare-tunnel-shared.yml
+
+# Cloudflare Tunnel (jp)
+kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
+kubectl apply -f base/infrastructure/networking/cloudflare-tunnel-jp.yml
 
 # Grafana Alloy
 kubectl apply -f base/secrets/grafana-alloy.yml
