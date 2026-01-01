@@ -1,0 +1,71 @@
+# Restore PostgreSQL DB from Cloudflare R2
+#
+# Edit:
+# - NAMESPACE_SAMPLE
+# - RESTORE_FILE_NAME_SAMPLE.sql.gz
+#
+# Check Secrets in NAMESPACE:
+# - db-pass
+# - r2-creds
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-restore
+  namespace: "NAMESPACE_SAMPLE" # %%%%% EDIT HERE %%%%%%
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: restore-worker
+          image: postgres:18-alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - | #sh
+              set -e
+              apk add --no-cache aws-cli
+
+              echo "[INFO] Starting restore from s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME} ..."
+              export PGPASSWORD="${DB_PASS}"
+              aws s3 cp "s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME}" - \
+                --endpoint-url "$S3_ENDPOINT" \
+                --no-progress \
+              | gunzip \
+              | psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -w
+              echo "[INFO] Restore completed successfully."
+
+          envFrom:
+            - secretRef:
+                name: r2-creds
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-pass
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: db-pass
+                  key: password
+
+            # =========== VARS ===========
+            - name: RESTORE_FILE_NAME
+              value: "RESTORE_FILE_NAME_SAMPLE.sql.gz" # %%%%%% EDIT HERE %%%%%%
+            - name: S3_ENDPOINT
+              value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com" # CHECK HERE
+            - name: BUCKET_NAME
+              value: "p-backup" # CHECK HERE
+            - name: DB_HOST
+              value: "db-rw" # CHECK HERE
+            - name: DB_PORT
+              value: "5432" # CHECK HERE
+            - name: DB_NAME
+              value: "misskey" # CHECK HERE

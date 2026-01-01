@@ -5,18 +5,6 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net
 
 ---
-# object storage for backup of postgresql
-apiVersion: v1
-kind: Secret
-metadata:
-  name: r2-creds
-  namespace: misskey-mk-dev-k8s-xiupos-net
-  annotations:
-    reflector.v1.k8s.emberstack.com/reflects: "postgres-operator/r2-creds"
-type: Opaque
-data: {}
-
----
 # postgresql
 apiVersion: v1
 kind: Secret
@@ -36,6 +24,7 @@ metadata:
   namespace: misskey-mk-dev-k8s-xiupos-net
 spec:
   instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
   storage:
     size: 20Gi
     storageClass: local-path
@@ -47,6 +36,101 @@ spec:
         name: db-pass
 
 ---
+# set r2 secrets for backup
+apiVersion: v1
+kind: Secret
+metadata:
+  name: r2-creds
+  namespace: misskey-mk-dev-k8s-xiupos-net
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflects: "postgres-operator/r2-creds"
+type: Opaque
+data: {}
+
+# =============== COMMENT OUT FOLLOWING WHEN RESTORING ===============
+
+---
+# schedule backup of postgresql
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: misskey-mk-dev-k8s-xiupos-net
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup-worker
+              image: postgres:18-alpine
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
+              command: ["/bin/sh", "-c"]
+              args:
+                - | #sh
+                  set -e
+                  apk add --no-cache aws-cli
+
+                  TIMESTAMP=$(date +%H)
+                  FILENAME="pgdump_${NAMESPACE}_${TIMESTAMP}.sql.gz"
+
+                  echo "[INFO] Starting backup: ${FILENAME}"
+                  export PGPASSWORD="${DB_PASS}"
+                  pg_dump -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  if [ ! -f "/tmp/${FILENAME}" ]; then
+                    echo "[ERROR] Dump file not found!"
+                    exit 1
+                  fi
+
+                  echo "[INFO] Uploading to s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME} ..."
+                  aws s3 cp "/tmp/${FILENAME}" "s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME}" \
+                    --endpoint-url "$S3_ENDPOINT" \
+                    --no-progress
+                  echo "[INFO] Backup completed successfully."
+
+              envFrom:
+                - secretRef:
+                    name: r2-creds
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-pass
+                      key: username
+                - name: DB_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-pass
+                      key: password
+
+                - name: S3_ENDPOINT
+                  value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com"
+                - name: BUCKET_NAME
+                  value: "p-backup"
+                - name: DB_HOST
+                  value: "db-rw"
+                - name: DB_PORT
+                  value: "5432"
+                - name: DB_NAME
+                  value: "misskey"
+
+---
 # valkey 1 (persistent; for job queue)
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
@@ -54,7 +138,7 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net-valkey-persistent
 spec:
   chart: valkey
-  repo: https://valkey.io/valkey-helm/
+  repo: https://charts.bitnami.com/bitnami
   targetNamespace: misskey-mk-dev-k8s-xiupos-net
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
@@ -77,7 +161,7 @@ metadata:
   name: misskey-mk-dev-k8s-xiupos-net-valkey-ephemeral
 spec:
   chart: valkey
-  repo: https://valkey.io/valkey-helm/
+  repo: https://charts.bitnami.com/bitnami
   targetNamespace: misskey-mk-dev-k8s-xiupos-net
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
@@ -100,6 +184,7 @@ metadata:
 data:
   default.yml: | #yaml
     # https://github.com/misskey-dev/misskey/blob/develop/.config/example.yml
+
     url: https://mk-dev-k8s.xiupos.net/
     port: 3000
 
