@@ -1,0 +1,30 @@
+# s3 redirect for old files
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-files
+  namespace: misskey-mk-xiupos-net
+spec:
+  redirectRegex:
+    regex: "^https?://[^/]+/files/(.*)"
+    replacement: https://mk-s3.xiupos.net/files/${1}
+    permanent: false
+
+---
+# ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: misskey-ingress
+  namespace: misskey-mk-xiupos-net
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`mk.xiupos.net`)
+      kind: Rule
+      middlewares:
+        - name: redirect-files
+      services:
+        - name: misskey
+          port: 3000

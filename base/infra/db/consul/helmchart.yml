@@ -1,0 +1,35 @@
+# https://developer.hashicorp.com/consul/docs/reference/k8s/helm
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: consul
+  namespace: kube-system
+spec:
+  chart: consul
+  repo: https://helm.releases.hashicorp.com
+  targetNamespace: consul
+  valuesContent: |- #yaml
+
+    global:
+      name: consul
+      datacenter: ap_notheast_1
+
+    server:
+      replicas: 1
+      bootstrapExpect: 3 # number of clusters
+
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+        limits:
+          memory: 512Mi
+          cpu: 500m
+
+    ui:
+      enabled: true
+      service:
+        type: ClusterIP
+
+    connectInject:
+      enabled: false

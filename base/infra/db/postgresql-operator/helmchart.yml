@@ -1,0 +1,12 @@
+# https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cnpg
+  namespace: kube-system
+spec:
+  chart: cloudnative-pg
+  repo: https://cloudnative-pg.github.io/charts
+  version: "0.27.0"
+  targetNamespace: postgres-operator
+  valuesContent: |- #yaml

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: misskey
+  namespace: misskey-mk-dev-xiupos-net
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: misskey
+  template:
+    metadata:
+      labels:
+        app: misskey
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1
+          command: ["sh", "-c"]
+          args:
+            - | #sh
+              until nc -vz -w 2 db-rw 5432; do sleep 2; done
+              until nc -vz -w 2 db-r 5432; do sleep 2; done
+              until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
+              until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
+
+      containers:
+        - name: misskey
+          image: misskey/misskey:2025.12.2
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: config
+              mountPath: /misskey/.config/default.yml
+              subPath: default.yml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1500m
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+
+      volumes:
+        - name: config
+          configMap:
+            name: misskey-config

@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - postgresql.yml
+  - valkey-persistent.yml
+  - valkey-ephemeral.yml
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+
+secretGenerator:
+  - name: r2-creds
+    namespace: misskey-mk-dev-xiupos-net
+    env: ../../../../secrets/r2-creds-p-backup.env
+
+configMapGenerator:
+  - name: misskey-config
+    namespace: misskey-mk-dev-xiupos-net
+    files:
+      - default.yml=config/default.yml

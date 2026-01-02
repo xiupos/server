@@ -1,0 +1,23 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |- #yaml
+    # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/VALUES.md
+
+    logs:
+      general:
+        level: INFO
+      access:
+        enabled: true
+
+    service:
+      enabled: true
+      type: ClusterIP
+
+    # for cloudflare tunnel
+    additionalArguments:
+      - --entryPoints.web.forwardedHeaders.insecure
+      - --entryPoints.web.proxyProtocol.insecure

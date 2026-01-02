@@ -64,31 +64,10 @@ cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube
 ### Apply manifests
 
 ```sh
-# common
-kubectl apply -f base/infra/common/utils.yml
-
-# Ingress (Traefik)
-kubectl apply -f base/infra/net/traefik-config.yml
-
-# Cloudflare Tunnel (shared)
-kubectl apply -f base/secrets/cloudflare-tunnel-shared.yml
-kubectl apply -f base/infra/net/cloudflare-tunnel-shared.yml
-
-# # Cloudflare Tunnel (jp only)
-# kubectl apply -f base/secrets/cloudflare-tunnel-jp.yml
-# kubectl apply -f base/infra/net/cloudflare-tunnel-jp.yml
-
-# Grafana K8s Monitoring
-cp base/infra/monitor/grafana-k8s-monitoring-example.yml base/infra/monitor/grafana-k8s-monitoring.yml
-# edit base/infra/monitor/grafana-k8s-monitoring.yml
-kubectl apply -f base/infra/monitor/grafana-k8s-monitoring.yml
-
-# PostgreSQL Operator (CloudNativePG)
-kubectl apply -f base/secrets/postgres-operator.yml
-kubectl apply -f base/infra/db/postgres-operator.yml
+kubectl kustomize --load-restrictor LoadRestrictionsNone base/ | kubectl apply -f -
 ```
 
-## Start Apps
+## (WIP) Start Apps
 
 ### Misskey (mk-dev.xiupos.net; jp only)
 

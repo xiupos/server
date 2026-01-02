@@ -1,0 +1,11 @@
+# https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: grafana-k8s-monitoring
+  namespace: kube-system
+spec:
+  chart: k8s-monitoring
+  repo: https://grafana.github.io/helm-charts
+  targetNamespace: grafana-k8s-monitoring
+  valuesContent: ""

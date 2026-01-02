@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - helmchart.yml
+
+configMapGenerator:
+  - name: values-store
+    files:
+      - valuesContent=../../../../secrets/grafana-values.yml
+    options:
+      disableNameSuffixHash: true
+      annotations:
+        kustomize.config.k8s.io/needs-hash: "false"
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: values-store
+      fieldPath: data.valuesContent
+    targets:
+      - select:
+          kind: HelmChart
+          name: grafana-k8s-monitoring
+          namespace: kube-system
+        fieldPaths:
+          - spec.valuesContent
