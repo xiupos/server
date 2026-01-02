@@ -64,7 +64,8 @@ cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube
 ### Apply manifests
 
 ```sh
-kubectl kustomize --load-restrictor LoadRestrictionsNone base/ | kubectl apply -f -
+# jp
+kubectl kustomize --load-restrictor LoadRestrictionsNone overlays/jp | kubectl apply -f - --dry-run
 ```
 
 ## (WIP) Start Apps
