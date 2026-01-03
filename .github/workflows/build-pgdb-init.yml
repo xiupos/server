@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - docker/
-      - .github/workflows/build-pgdb-init.yml
+      - "docker/pgdb-init/**"
+      - "!docker/pgdb-init/README.md"
+      - ".github/workflows/build-pgdb-init.yml"
 
 env:
   REGISTRY: ghcr.io
