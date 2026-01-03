@@ -1,0 +1,74 @@
+# schedule backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: misskey-mk-xiupos-net
+spec:
+  schedule: "15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup-worker
+              image: postgres:18-alpine
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+              command: ["/bin/sh", "-c"]
+              args:
+                - | #sh
+                  set -e
+                  apk add --no-cache aws-cli
+
+                  H=$(date +%H)
+                  SIGN=$((${H} % 2))
+                  FILENAME="pgdump_${NAMESPACE}_${SIGN}.sql.gz"
+
+                  echo "[INFO] Starting backup: ${FILENAME}"
+                  export PGPASSWORD="${APP_DB_PASS}"
+                  pg_dump -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  if [ ! -f "/tmp/${FILENAME}" ]; then
+                    echo "[ERROR] Dump file not found!"
+                    exit 1
+                  fi
+
+                  echo "[INFO] Uploading to s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME} ..."
+                  aws s3 cp "/tmp/${FILENAME}" "s3://${BUCKET_NAME}/${NAMESPACE}/${FILENAME}" \
+                    --endpoint-url "$S3_ENDPOINT" \
+                    --no-progress
+                  echo "[INFO] Backup completed successfully."
+
+              envFrom:
+                - secretRef:
+                    name: r2-creds
+              env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+
+                - name: S3_ENDPOINT
+                  value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com"
+                - name: BUCKET_NAME
+                  value: "p-backup"
+                - name: PGHOST
+                  value: "db-rw.postgres-common.svc.cluster.local"
+                - name: PGPORT
+                  value: "5432"
+                - name: APP_DB_NAME
+                  value: "misskey-mk-xiupos-net"
+                - name: APP_DB_USER
+                  value: "misskey-mk-xiupos-net-user"
+                - name: APP_DB_PASS
+                  value: "misskey-mk-xiupos-net-pass"

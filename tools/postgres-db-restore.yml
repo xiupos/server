@@ -64,7 +64,9 @@ spec:
                 --endpoint-url "$S3_ENDPOINT" \
                 --no-progress \
               | gunzip \
-              | psql -h "${PGHOST}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" -w
+              | sed -E 's/(^ALTER .* OWNER TO)/-- \1/' \
+              | sed -E 's/(^SET SESSION AUTHORIZATION)/-- \1/' \
+              | psql -h "${PGHOST}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" -v ON_ERROR_STOP=1
               echo "[INFO] Restore completed successfully."
 
           envFrom:

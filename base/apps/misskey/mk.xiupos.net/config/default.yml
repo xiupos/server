@@ -5,11 +5,11 @@ url: https://mk.xiupos.net/
 port: 3000
 
 db:
-  host: db-rw
+  host: db-rw.postgres-common.svc.cluster.local
   port: 5432
-  db: misskey
-  user: example-misskey-user
-  pass: example-misskey-pass
+  db: misskey-mk-xiupos-net
+  user: misskey-mk-xiupos-net-user
+  pass: misskey-mk-xiupos-net-pass
   extra:
     statement_timeout: 0
 
@@ -17,11 +17,11 @@ db:
 # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
 dbReplications: true
 dbSlaves:
-  - host: db-r
+  - host: db-r.postgres-common.svc.cluster.local
     port: 5432
-    db: misskey
-    user: example-misskey-user
-    pass: example-misskey-pass
+    db: misskey-mk-xiupos-net
+    user: misskey-mk-xiupos-net-user
+    pass: misskey-mk-xiupos-net-pass
     extra:
       statement_timeout: 0
 
