@@ -18,3 +18,11 @@ configMapGenerator:
     namespace: misskey-mk-xiupos-net
     files:
       - default.yml=config/default.yml
+  - name: gdrive-rclone-config
+    namespace: misskey-mk-xiupos-net
+    files:
+      - rclone.conf=../../../../secrets/gdrive-rclone.conf
+    options:
+      disableNameSuffixHash: true
+      annotations:
+        kustomize.config.k8s.io/needs-hash: "false"

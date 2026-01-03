@@ -15,7 +15,7 @@ spec:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: backup-worker
+            - name: backup-to-s3
               image: postgres:18-alpine
               imagePullPolicy: IfNotPresent
               resources:
@@ -72,3 +72,64 @@ spec:
                   value: "misskey-mk-dev-xiupos-net-user"
                 - name: APP_DB_PASS
                   value: "misskey-mk-dev-xiupos-net-pass"
+
+            - name: backup-to-gdrive
+              image: postgres:18-alpine
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+              command: ["/bin/sh", "-c"]
+              args:
+                - | #sh
+                  set -e
+                  apk add --no-cache rclone ca-certificates
+
+                  FILENAME="pgdump_${NAMESPACE}.sql.gz"
+
+                  echo "[INFO] Starting backup: ${FILENAME}"
+                  export PGPASSWORD="${APP_DB_PASS}"
+                  pg_dump -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  if [ ! -f "/tmp/${FILENAME}" ]; then
+                    echo "[ERROR] Dump file not found!"
+                    exit 1
+                  fi
+
+                  TARGET_PATH="gdrive:Data/Server/${NAMESPACE}/"
+
+                  echo "[INFO] Uploading to ${TARGET_PATH} ..."
+                  rclone copy "/tmp/${FILENAME}" "${TARGET_PATH}"
+                  echo "[INFO] Backup completed successfully."
+
+              volumeMounts:
+                - name: rclone-config-vol
+                  mountPath: /config/rclone
+                  readOnly: true
+
+              env:
+                - name: RCLONE_CONFIG
+                  value: /config/rclone/rclone.conf
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+
+                - name: PGHOST
+                  value: "db-r.postgres-common.svc.cluster.local"
+                - name: PGPORT
+                  value: "5432"
+                - name: APP_DB_NAME
+                  value: "misskey-mk-dev-xiupos-net"
+                - name: APP_DB_USER
+                  value: "misskey-mk-dev-xiupos-net-user"
+                - name: APP_DB_PASS
+                  value: "misskey-mk-dev-xiupos-net-pass"
+
+          volumes:
+            - name: rclone-config-vol
+              configMap:
+                name: gdrive-rclone-config
