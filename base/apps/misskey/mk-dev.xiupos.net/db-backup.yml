@@ -63,7 +63,7 @@ spec:
                 - name: BUCKET_NAME
                   value: "p-backup"
                 - name: PGHOST
-                  value: "db-ro.postgres-common.svc.cluster.local"
+                  value: "db-r.postgres-common.svc.cluster.local"
                 - name: PGPORT
                   value: "5432"
                 - name: APP_DB_NAME
