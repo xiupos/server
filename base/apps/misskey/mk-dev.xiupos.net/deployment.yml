@@ -25,7 +25,7 @@ spec:
           args:
             - | #sh
               until nc -vz -w 2 db-rw.postgres-common.svc.cluster.local 5432; do sleep 2; done
-              until nc -vz -w 2 db-r.postgres-common.svc.cluster.local 5432; do sleep 2; done
+              until nc -vz -w 2 db-ro.postgres-common.svc.cluster.local 5432; do sleep 2; done
               until nc -vz -w 2 redis-ephemeral-primary 6379; do sleep 2; done
               until nc -vz -w 2 redis-primary.redis-common.svc.cluster.local 6379; do sleep 2; done
 
@@ -43,7 +43,7 @@ spec:
               cpu: 100m
               memory: 512Mi
             limits:
-              cpu: 1000m
+              cpu: 500m
               memory: 1Gi
           readinessProbe:
             httpGet:

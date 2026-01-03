@@ -5,16 +5,21 @@ metadata:
   name: db
   namespace: postgres-common
 spec:
-  instances: 1
+  instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:18
   enableSuperuserAccess: true
   storage:
     size: 10Gi
     storageClass: local-path
+
+  postgresql:
+    parameters:
+      shared_buffers: 256MB
+
   resources:
     requests:
-      cpu: 500m
-      memory: 256Mi
+      cpu: 150m
+      memory: 384Mi
     limits:
-      cpu: 2000m
-      memory: 1Gi
+      cpu: 300m
+      memory: 512Mi

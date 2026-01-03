@@ -16,7 +16,7 @@ db:
 # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
 dbReplications: true
 dbSlaves:
-  - host: db-r.postgres-common.svc.cluster.local
+  - host: db-ro.postgres-common.svc.cluster.local
     port: 5432
     db: misskey-mk-dev-xiupos-net
     user: misskey-mk-dev-xiupos-net-user
