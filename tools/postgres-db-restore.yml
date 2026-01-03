@@ -3,10 +3,11 @@
 # Edit:
 # - NAMESPACE_SAMPLE
 # - RESTORE_FILE_NAME_SAMPLE.sql.gz
-#
-# Check Secrets in NAMESPACE:
-# - db-pass
-# - r2-creds
+# - APP_DB_NAME_SAMPLE
+# - APP_DB_USER_SAMPLE
+# - APP_DB_PASS_SAMPLE
+# - AWS_ACCESS_KEY_ID_SAMPLE
+# - AWS_SECRET_ACCESS_KEY_SAMPLE
 
 apiVersion: batch/v1
 kind: Job
@@ -29,44 +30,40 @@ spec:
               apk add --no-cache aws-cli
 
               echo "[INFO] Starting restore from s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME} ..."
-              export PGPASSWORD="${DB_PASS}"
-              until nc -vz -w 2 $DB_HOST $DB_PORT; do sleep 2; done
+              export PGPASSWORD="${APP_DB_PASS}"
+              until nc -vz -w 2 $PGHOST $PGPORT; do sleep 2; done
               aws s3 cp "s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME}" - \
                 --endpoint-url "$S3_ENDPOINT" \
                 --no-progress \
               | gunzip \
-              | psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -w
+              | psql -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" -w
               echo "[INFO] Restore completed successfully."
 
-          envFrom:
-            - secretRef:
-                name: r2-creds
           env:
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: db-pass
-                  key: username
-            - name: DB_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: db-pass
-                  key: password
 
             # =========== VARS ===========
             - name: RESTORE_FILE_NAME
               value: "RESTORE_FILE_NAME_SAMPLE.sql.gz" # %%%%%% EDIT HERE %%%%%%
+            - name: APP_DB_NAME
+              value: "APP_DB_NAME_SAMPLE" # %%%%%% EDIT HERE %%%%%%
+            - name: APP_DB_USER
+              value: "APP_DB_USER_SAMPLE" # %%%%%% EDIT HERE %%%%%%
+            - name: APP_DB_PASS
+              value: "APP_DB_PASS_SAMPLE" # %%%%%% EDIT HERE %%%%%%
+            - name: AWS_ACCESS_KEY_ID
+              value: "AWS_ACCESS_KEY_ID_SAMPLE" # %%%%%% EDIT HERE %%%%%%
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "AWS_SECRET_ACCESS_KEY_SAMPLE" # %%%%%% EDIT HERE %%%%%%
+
+            - name: PGHOST
+              value: "db-rw.postgresql-common.svc.cluster.local" # CHECK HERE
+            - name: PGPORT
+              value: "5432" # CHECK HERE
             - name: S3_ENDPOINT
               value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com" # CHECK HERE
             - name: BUCKET_NAME
               value: "p-backup" # CHECK HERE
-            - name: DB_HOST
-              value: "db-rw" # CHECK HERE
-            - name: DB_PORT
-              value: "5432" # CHECK HERE
-            - name: DB_NAME
-              value: "misskey" # CHECK HERE
