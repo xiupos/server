@@ -6,5 +6,5 @@ resources:
   - net/cloudflare-tunnel-shared
   - net/cloudflare-tunnel-jp # TODO: use overlays
   - monitor/grafana-k8s-monitoring
-  - db/postgresql-operator
+  - db/postgres-operator
   # - db/consul
