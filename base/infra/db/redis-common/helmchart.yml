@@ -1,15 +1,16 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: misskey-mk-dev-xiupos-net-redis-persistent
+  name: redis-common
+  namespace: kube-system
 spec:
   chart: valkey
   repo: https://charts.bitnami.com/bitnami
-  targetNamespace: misskey-mk-dev-xiupos-net
+  targetNamespace: redis-common
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
 
-    fullnameOverride: redis-persistent
+    fullnameOverride: redis
     architecture: standalone
     master:
       persistence:
@@ -25,3 +26,8 @@ spec:
           memory: 128Mi
     auth:
       enabled: false
+
+    configuration: |-
+        maxmemory 200mb
+        maxmemory-policy noeviction
+        appendonly yes

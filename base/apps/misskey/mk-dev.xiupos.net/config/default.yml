@@ -31,15 +31,16 @@ redis:
 redisForPubsub:
   host: redis-ephemeral-primary
   port: 6379
-redisForJobQueue:
-  host: redis-persistent-primary
-  port: 6379
 redisForTimelines:
   host: redis-ephemeral-primary
   port: 6379
 redisForReactions:
   host: redis-ephemeral-primary
   port: 6379
+redisForJobQueue:
+  host: redis-primary.redis-common.svc.cluster.local
+  port: 6379
+  prefix: misskey-mk-dev-xiupos-net-user
 
 # DEV: NO FEDERATION
 proxy: http://127.0.0.1:3128
