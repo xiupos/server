@@ -1,15 +1,14 @@
-
 # https://github.com/misskey-dev/misskey/blob/develop/.config/example.yml
 
 url: https://mk-dev.xiupos.net/
 port: 3000
 
 db:
-  host: db-rw
+  host: db-rw.postgres-common.svc.cluster.local
   port: 5432
-  db: misskey
-  user: example-misskey-user
-  pass: example-misskey-pass
+  db: misskey-mk-dev-xiupos-net
+  user: misskey-mk-dev-xiupos-net-user
+  pass: misskey-mk-dev-xiupos-net-pass
   extra:
     statement_timeout: 0
 
@@ -17,11 +16,11 @@ db:
 # https://orkhan.gitbook.io/typeorm/docs/docs/data-source/3-multiple-data-sources#replication
 dbReplications: true
 dbSlaves:
-  - host: db-r
+  - host: db-r.postgres-common.svc.cluster.local
     port: 5432
-    db: misskey
-    user: example-misskey-user
-    pass: example-misskey-pass
+    db: misskey-mk-dev-xiupos-net
+    user: misskey-mk-dev-xiupos-net-user
+    pass: misskey-mk-dev-xiupos-net-pass
     extra:
       statement_timeout: 0
 

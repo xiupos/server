@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yml
-  - postgresql.yml
+  - db-backup.yml
   - redis-persistent.yml
   - redis-ephemeral.yml
   - deployment.yml
