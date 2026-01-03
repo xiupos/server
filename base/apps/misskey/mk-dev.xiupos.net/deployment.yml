@@ -26,8 +26,8 @@ spec:
             - | #sh
               until nc -vz -w 2 db-rw 5432; do sleep 2; done
               until nc -vz -w 2 db-r 5432; do sleep 2; done
-              until nc -vz -w 2 valkey-ephemeral-primary 6379; do sleep 2; done
-              until nc -vz -w 2 valkey-persistent-primary 6379; do sleep 2; done
+              until nc -vz -w 2 redis-ephemeral-primary 6379; do sleep 2; done
+              until nc -vz -w 2 redis-persistent-primary 6379; do sleep 2; done
 
       containers:
         - name: misskey

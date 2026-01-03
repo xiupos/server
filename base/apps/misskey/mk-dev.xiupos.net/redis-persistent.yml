@@ -1,19 +1,21 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: misskey-mk-xiupos-net-valkey-ephemeral
+  name: misskey-mk-dev-xiupos-net-redis-persistent
 spec:
   chart: valkey
   repo: https://charts.bitnami.com/bitnami
-  targetNamespace: misskey-mk-xiupos-net
+  targetNamespace: misskey-mk-dev-xiupos-net
   valuesContent: |- #yaml
     # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
 
-    fullnameOverride: valkey-ephemeral
+    fullnameOverride: redis-persistent
     architecture: standalone
     master:
       persistence:
-        enabled: false
+        enabled: true
+        storageClass: local-path
+        size: 1Gi
       resources:
         requests:
           cpu: 50m

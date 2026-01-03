@@ -27,19 +27,19 @@ dbSlaves:
 
 # https://misskey-hub.net/en/docs/for-admin/install/resources/scale-out/#role-based-redis-partitioning
 redis:
-  host: valkey-ephemeral-primary
+  host: redis-ephemeral-primary
   port: 6379
 redisForPubsub:
-  host: valkey-ephemeral-primary
+  host: redis-ephemeral-primary
   port: 6379
 redisForJobQueue:
-  host: valkey-persistent-primary
+  host: redis-persistent-primary
   port: 6379
 redisForTimelines:
-  host: valkey-ephemeral-primary
+  host: redis-ephemeral-primary
   port: 6379
 redisForReactions:
-  host: valkey-ephemeral-primary
+  host: redis-ephemeral-primary
   port: 6379
 
 proxyBypassHosts:

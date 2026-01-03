@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - namespace.yml
   - postgresql.yml
-  - valkey-persistent.yml
-  - valkey-ephemeral.yml
+  - redis-persistent.yml
+  - redis-ephemeral.yml
   - deployment.yml
   - service.yml
   - ingress.yml
