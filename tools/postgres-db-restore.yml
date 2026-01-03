@@ -1,27 +1,56 @@
 # Restore PostgreSQL DB from Cloudflare R2
-#
-# Edit:
-# - NAMESPACE_SAMPLE
-# - RESTORE_FILE_NAME_SAMPLE.sql.gz
-# - APP_DB_NAME_SAMPLE
-# - APP_DB_USER_SAMPLE
-# - APP_DB_PASS_SAMPLE
-# - AWS_ACCESS_KEY_ID_SAMPLE
-# - AWS_SECRET_ACCESS_KEY_SAMPLE
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: temp-db-restore-vars
+  namespace: postgres-common
+type: Opaque
+stringData:
+  TARGET_NAMESPACE: "target-namespace"
+  RESTORE_FILE_NAME: "pgdump_target-namespace.sql.gz"
+  APP_DB_NAME: "app-db-name"
+  APP_DB_USER: "app-db-user"
+  APP_DB_PASS: "app-db-pass"
+  AWS_ACCESS_KEY_ID: "xxxxx"
+  AWS_SECRET_ACCESS_KEY: "xxxxxxxxxx"
+  S3_ENDPOINT: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com"
+  BUCKET_NAME: "p-backup"
 
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: db-restore
-  namespace: "NAMESPACE_SAMPLE" # %%%%% EDIT HERE %%%%%%
+  namespace: postgres-common
 spec:
   backoffLimit: 0
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 60
   template:
     spec:
       restartPolicy: Never
+      initContainers:
+        - name: initialize-db
+          image: ghcr.io/xiupos/pgdb-init:latest
+          envFrom:
+            - secretRef:
+                name: temp-db-restore-vars
+          env:
+            - name: PGHOST
+              value: "db-rw"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: db-superuser
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-superuser
+                  key: password
+
       containers:
-        - name: restore-worker
+        - name: restore-db
           image: postgres:18-alpine
           command: ["/bin/sh", "-c"]
           args:
@@ -29,41 +58,18 @@ spec:
               set -e
               apk add --no-cache aws-cli
 
-              echo "[INFO] Starting restore from s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME} ..."
+              echo "[INFO] Starting restore from s3://${BUCKET_NAME}/${TARGET_NAMESPACE}/${RESTORE_FILE_NAME} ..."
               export PGPASSWORD="${APP_DB_PASS}"
-              until nc -vz -w 2 $PGHOST $PGPORT; do sleep 2; done
-              aws s3 cp "s3://${BUCKET_NAME}/${NAMESPACE}/${RESTORE_FILE_NAME}" - \
+              aws s3 cp "s3://${BUCKET_NAME}/${TARGET_NAMESPACE}/${RESTORE_FILE_NAME}" - \
                 --endpoint-url "$S3_ENDPOINT" \
                 --no-progress \
               | gunzip \
-              | psql -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" -w
+              | psql -h "${PGHOST}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" -w
               echo "[INFO] Restore completed successfully."
 
+          envFrom:
+            - secretRef:
+                name: temp-db-restore-vars
           env:
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-
-            # =========== VARS ===========
-            - name: RESTORE_FILE_NAME
-              value: "RESTORE_FILE_NAME_SAMPLE.sql.gz" # %%%%%% EDIT HERE %%%%%%
-            - name: APP_DB_NAME
-              value: "APP_DB_NAME_SAMPLE" # %%%%%% EDIT HERE %%%%%%
-            - name: APP_DB_USER
-              value: "APP_DB_USER_SAMPLE" # %%%%%% EDIT HERE %%%%%%
-            - name: APP_DB_PASS
-              value: "APP_DB_PASS_SAMPLE" # %%%%%% EDIT HERE %%%%%%
-            - name: AWS_ACCESS_KEY_ID
-              value: "AWS_ACCESS_KEY_ID_SAMPLE" # %%%%%% EDIT HERE %%%%%%
-            - name: AWS_SECRET_ACCESS_KEY
-              value: "AWS_SECRET_ACCESS_KEY_SAMPLE" # %%%%%% EDIT HERE %%%%%%
-
             - name: PGHOST
-              value: "db-rw.postgres-common.svc.cluster.local" # CHECK HERE
-            - name: PGPORT
-              value: "5432" # CHECK HERE
-            - name: S3_ENDPOINT
-              value: "https://ee4f5e9bb8e3f9fa0acc718bf562970c.r2.cloudflarestorage.com" # CHECK HERE
-            - name: BUCKET_NAME
-              value: "p-backup" # CHECK HERE
+              value: "db-rw"
