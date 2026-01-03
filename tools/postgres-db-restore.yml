@@ -60,7 +60,7 @@ spec:
               value: "AWS_SECRET_ACCESS_KEY_SAMPLE" # %%%%%% EDIT HERE %%%%%%
 
             - name: PGHOST
-              value: "db-rw.postgresql-common.svc.cluster.local" # CHECK HERE
+              value: "db-rw.postgres-common.svc.cluster.local" # CHECK HERE
             - name: PGPORT
               value: "5432" # CHECK HERE
             - name: S3_ENDPOINT
