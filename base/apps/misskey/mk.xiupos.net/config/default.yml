@@ -41,7 +41,7 @@ redisForReactions:
 redisForJobQueue:
   host: redis-primary.redis-common.svc.cluster.local
   port: 6379
-  prefix: misskey-mk-xiupos-net-user
+  prefix: misskey-mk-xiupos-net
 
 proxyBypassHosts:
   - api.deepl.com

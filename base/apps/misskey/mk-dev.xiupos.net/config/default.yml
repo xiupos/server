@@ -40,7 +40,7 @@ redisForReactions:
 redisForJobQueue:
   host: redis-primary.redis-common.svc.cluster.local
   port: 6379
-  prefix: misskey-mk-dev-xiupos-net-user
+  prefix: misskey-mk-dev-xiupos-net
 
 # DEV: NO FEDERATION
 proxy: http://127.0.0.1:3128
