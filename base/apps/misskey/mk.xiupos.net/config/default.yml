@@ -39,8 +39,9 @@ redisForTimelines:
   host: redis-ephemeral-primary
   port: 6379
 redisForReactions:
-  host: redis-ephemeral-primary
+  host: redis-primary.redis-common.svc.cluster.local
   port: 6379
+  prefix: misskey-mk-xiupos-net-user
 
 proxyBypassHosts:
   - api.deepl.com
