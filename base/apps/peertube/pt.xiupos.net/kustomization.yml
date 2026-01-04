@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - db-backup.yml
+  - redis.yml
+  - pvc.yml
+  - deployment.yml
+  - service-ingress.yml
+
+secretGenerator:
+  - name: r2-creds
+    namespace: peertube-pt-xiupos-net
+    env: ../../../../secrets/r2-creds-p-backup.env
+  - name: peertube-config
+    namespace: peertube-pt-xiupos-net
+    env: config/default.env
+  - name: peertube-secrets
+    namespace: peertube-pt-xiupos-net
+    env: ../../../../secrets/peertube-pt-xiupos-net.env
+
+configMapGenerator:
+  - name: gdrive-rclone-config
+    namespace: peertube-pt-xiupos-net
+    files:
+      - rclone.conf=../../../../secrets/gdrive-rclone.conf
+    options:
+      disableNameSuffixHash: true
+      annotations:
+        kustomize.config.k8s.io/needs-hash: "false"
+  - name: local-config
+    namespace: peertube-pt-xiupos-net
+    files:
+      - local-production.json=config/local-production.json

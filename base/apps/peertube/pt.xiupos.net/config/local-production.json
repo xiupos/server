@@ -1,0 +1,315 @@
+{
+  "instance": {
+    "name": "PosTube",
+    "short_description": "PeerTube, an ActivityPub-federated video streaming platform using P2P directly in your web browser.",
+    "description": "Welcome to this PeerTube instance!",
+    "terms": "No terms for now.",
+    "code_of_conduct": "",
+    "creation_reason": "",
+    "moderation_information": "",
+    "administrator": "",
+    "maintenance_lifetime": "",
+    "business_model": "",
+    "hardware_information": "",
+    "default_language": "en-US",
+    "languages": [],
+    "categories": [],
+    "is_nsfw": false,
+    "default_nsfw_policy": "do_not_list",
+    "server_country": "",
+    "support": {
+      "text": ""
+    },
+    "social": {
+      "bluesky_link": "",
+      "mastodon_link": "",
+      "x_link": "",
+      "external_link": ""
+    },
+    "default_client_route": "/videos/browse",
+    "customizations": {
+      "css": "",
+      "javascript": ""
+    }
+  },
+  "theme": {
+    "default": "default",
+    "customization": {
+      "primary_color": null,
+      "foreground_color": null,
+      "background_color": null,
+      "background_secondary_color": null,
+      "menu_foreground_color": null,
+      "menu_background_color": null,
+      "menu_border_radius": null,
+      "header_foreground_color": null,
+      "header_background_color": null,
+      "input_border_radius": null
+    }
+  },
+  "services": {
+    "twitter": {
+      "username": "@Chocobozzz"
+    }
+  },
+  "client": {
+    "header": {
+      "hide_instance_name": false
+    },
+    "videos": {
+      "miniature": {
+        "prefer_author_display_name": false
+      }
+    },
+    "browse_videos": {
+      "default_sort": "-publishedAt",
+      "default_scope": "federated"
+    },
+    "menu": {
+      "login": {
+        "redirect_on_single_external_auth": false
+      }
+    }
+  },
+  "cache": {
+    "previews": {
+      "size": 500
+    },
+    "captions": {
+      "size": 500
+    },
+    "torrents": {
+      "size": 500
+    },
+    "storyboards": {
+      "size": 500
+    }
+  },
+  "signup": {
+    "enabled": false,
+    "limit": 10,
+    "requires_approval": true,
+    "requires_email_verification": false,
+    "minimum_age": 16
+  },
+  "admin": {
+    "email": "me@xiupos.net"
+  },
+  "contact_form": {
+    "enabled": false
+  },
+  "user": {
+    "history": {
+      "videos": {
+        "enabled": true
+      }
+    },
+    "video_quota": -1,
+    "video_quota_daily": -1,
+    "default_channel_name": "Main $1 channel"
+  },
+  "video_channels": {
+    "max_per_user": 20
+  },
+  "transcoding": {
+    "enabled": false,
+    "original_file": {
+      "keep": false
+    },
+    "remote_runners": {
+      "enabled": false
+    },
+    "allow_additional_extensions": true,
+    "allow_audio_files": true,
+    "threads": 1,
+    "concurrency": 1,
+    "profile": "default",
+    "resolutions": {
+      "0p": false,
+      "144p": false,
+      "240p": false,
+      "360p": false,
+      "480p": false,
+      "720p": false,
+      "1080p": false,
+      "1440p": false,
+      "2160p": false
+    },
+    "always_transcode_original_resolution": true,
+    "fps": {
+      "max": 60
+    },
+    "web_videos": {
+      "enabled": false
+    },
+    "hls": {
+      "enabled": false,
+      "split_audio_and_video": false
+    }
+  },
+  "live": {
+    "enabled": false,
+    "allow_replay": true,
+    "latency_setting": {
+      "enabled": true
+    },
+    "max_duration": -1,
+    "max_instance_lives": 20,
+    "max_user_lives": 3,
+    "transcoding": {
+      "enabled": true,
+      "remote_runners": {
+        "enabled": false
+      },
+      "threads": 2,
+      "profile": "default",
+      "resolutions": {
+        "0p": false,
+        "144p": false,
+        "240p": false,
+        "360p": false,
+        "480p": false,
+        "720p": false,
+        "1080p": false,
+        "1440p": false,
+        "2160p": false
+      },
+      "always_transcode_original_resolution": true,
+      "fps": {
+        "max": 60
+      }
+    }
+  },
+  "video_studio": {
+    "enabled": false,
+    "remote_runners": {
+      "enabled": false
+    }
+  },
+  "video_transcription": {
+    "enabled": false,
+    "remote_runners": {
+      "enabled": false
+    }
+  },
+  "video_file": {
+    "update": {
+      "enabled": false
+    }
+  },
+  "import": {
+    "videos": {
+      "concurrency": 1,
+      "http": {
+        "enabled": false
+      },
+      "torrent": {
+        "enabled": false
+      }
+    },
+    "video_channel_synchronization": {
+      "enabled": false,
+      "max_per_user": 10
+    },
+    "users": {
+      "enabled": true
+    }
+  },
+  "export": {
+    "users": {
+      "enabled": false,
+      "export_expiration": 172800000,
+      "max_user_video_quota": 10737418240
+    }
+  },
+  "trending": {
+    "videos": {
+      "algorithms": {
+        "enabled": ["hot", "most-viewed", "most-liked"],
+        "default": "hot"
+      }
+    }
+  },
+  "auto_blacklist": {
+    "videos": {
+      "of_users": {
+        "enabled": false
+      }
+    }
+  },
+  "followers": {
+    "instance": {
+      "enabled": true,
+      "manual_approval": false
+    },
+    "channels": {
+      "enabled": true
+    }
+  },
+  "followings": {
+    "instance": {
+      "auto_follow_back": {
+        "enabled": false
+      },
+      "auto_follow_index": {
+        "enabled": false,
+        "index_url": ""
+      }
+    }
+  },
+  "broadcast_message": {
+    "enabled": false,
+    "message": "",
+    "level": "info",
+    "dismissable": false
+  },
+  "search": {
+    "remote_uri": {
+      "users": true,
+      "anonymous": false
+    },
+    "search_index": {
+      "enabled": false,
+      "url": "https://sepiasearch.org",
+      "disable_local_search": false,
+      "is_default_search": false
+    }
+  },
+  "storyboards": {
+    "enabled": false,
+    "remote_runners": {
+      "enabled": false
+    }
+  },
+  "defaults": {
+    "publish": {
+      "download_enabled": true,
+      "comments_policy": 1,
+      "privacy": 1,
+      "licence": null
+    },
+    "p2p": {
+      "webapp": {
+        "enabled": true
+      },
+      "embed": {
+        "enabled": true
+      }
+    },
+    "player": {
+      "theme": "galaxy",
+      "auto_play": true
+    }
+  },
+  "email": {
+    "body": {
+      "signature": ""
+    },
+    "subject": {
+      "prefix": "[{{instanceName}}] "
+    }
+  },
+  "video_comments": {
+    "accept_remote_comments": true
+  }
+}

@@ -1,0 +1,60 @@
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: peertube
+  namespace: peertube-pt-xiupos-net
+spec:
+  selector:
+    app: peertube
+  ports:
+    - port: 9000
+      targetPort: 9000
+
+---
+# add headers
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: peertube-headers
+  namespace: peertube-pt-xiupos-net
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+      X-Forwarded-Port: "443"
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+    sslProxyHeaders:
+      X-Forwarded-Proto: "https"
+
+---
+# enable compression
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: peertube-compress
+  namespace: peertube-pt-xiupos-net
+spec:
+  compress: {}
+
+---
+# ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: peertube-ingress
+  namespace: peertube-pt-xiupos-net
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`pt.xiupos.net`)
+      kind: Rule
+      middlewares:
+        - name: peertube-headers
+        - name: peertube-compress
+      services:
+        - name: peertube
+          port: 9000
