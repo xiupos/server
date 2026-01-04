@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peertube
+  namespace: peertube-pt-xiupos-net
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: peertube
+  template:
+    metadata:
+      labels:
+        app: peertube
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1
+          command: ["sh", "-c"]
+          args:
+            - | #sh
+              until nc -vz -w 2 db-rw.postgres-common.svc.cluster.local 5432; do sleep 2; done
+              until nc -vz -w 2 redis-primary 6379; do sleep 2; done
+
+      containers:
+        - name: peertube
+          image: chocobozzz/peertube:production
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - secretRef:
+                name: peertube-config
+            - secretRef:
+                name: peertube-secrets
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: local-pvc
+        - name: config
+          configMap:
+            name: local-config

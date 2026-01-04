@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init-peertube
+  namespace: postgres-common
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-init
+          image: ghcr.io/xiupos/pgdb-init:latest
+          env:
+            - name: PGHOST
+              value: "db-rw"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: db-superuser
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-superuser
+                  key: password
+            - name: APP_DB_NAME
+              value: "peertube-pt-xiupos-net"
+            - name: APP_DB_USER
+              value: "peertube-pt-xiupos-net-user"
+            - name: APP_DB_PASS
+              value: "peertube-pt-xiupos-net-pass"

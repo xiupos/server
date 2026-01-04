@@ -1,0 +1,27 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: peertube-pt-xiupos-net-redis
+spec:
+  chart: valkey
+  repo: https://charts.bitnami.com/bitnami
+  targetNamespace: peertube-pt-xiupos-net
+  valuesContent: |- #yaml
+    # https://github.com/bitnami/charts/tree/main/bitnami/valkey#readme
+
+    fullnameOverride: redis
+    architecture: standalone
+    master:
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 256Mi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 500m
+          memory: 128Mi
+    auth:
+      enabled: false
