@@ -37,7 +37,15 @@ spec:
 
                   echo "[INFO] Starting backup: ${FILENAME}"
                   export PGPASSWORD="${APP_DB_PASS}"
-                  pg_dump -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  pg_dump \
+                    --no-owner \
+                    --no-acl \
+                    --clean \
+                    --if-exists \
+                    -h "${PGHOST}" \
+                    -p "${PGPORT}" \
+                    -U "${APP_DB_USER}" \
+                    -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
                   if [ ! -f "/tmp/${FILENAME}" ]; then
                     echo "[ERROR] Dump file not found!"
                     exit 1
@@ -93,7 +101,15 @@ spec:
 
                   echo "[INFO] Starting backup: ${FILENAME}"
                   export PGPASSWORD="${APP_DB_PASS}"
-                  pg_dump -h "${PGHOST}" -p "${PGPORT}" -U "${APP_DB_USER}" -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
+                  pg_dump \
+                    --no-owner \
+                    --no-acl \
+                    --clean \
+                    --if-exists \
+                    -h "${PGHOST}" \
+                    -p "${PGPORT}" \
+                    -U "${APP_DB_USER}" \
+                    -d "${APP_DB_NAME}" | gzip > "/tmp/${FILENAME}"
                   if [ ! -f "/tmp/${FILENAME}" ]; then
                     echo "[ERROR] Dump file not found!"
                     exit 1
