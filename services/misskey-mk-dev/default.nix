@@ -1,26 +1,35 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  misskeyName = "misskey-mk-dev";
+  misskeyImage = "misskey/misskey:2026.5.0";
+  url = "https://mk-dev.xiupos.net/";
+in {
+  system.activationScripts."pull-${misskeyName}".text = ''
+    ${pkgs.docker}/bin/docker pull ${misskeyImage}
+  '';
+
   # Misskey
-  virtualisation.arion.projects."misskey-mk-dev".settings = {
-    project.name = "misskey-mk-dev";
+  virtualisation.arion.projects."${misskeyName}".settings = {
+    project.name = "${misskeyName}";
 
     services.web.service = {
-      image = "misskey/misskey:2026.5.0";
+      image = misskeyImage;
       restart = "always";
       volumes = [
-        "/etc/misskey-mk-dev/default.yml:/misskey/.config/default.yml:ro"
+        "/etc/${misskeyName}/default.yml:/misskey/.config/default.yml:ro"
       ];
       network_mode = "host";
     };
   };
 
-  environment.etc."misskey-mk-dev/default.yml".text = ''
-    url: https://mk-dev.xiupos.net/
+  environment.etc."${misskeyName}/default.yml".text = ''
+    url: ${url}
     port: 3000
 
     db:
       host: 127.0.0.1
       port: 5432
-      db: misskey-mk-dev
+      db: ${misskeyName}
       user: postgres
       extra:
         statement_timeout: 0
@@ -45,7 +54,7 @@
   '';
 
   # Redis
-  services.redis.servers."misskey-mk-dev" = {
+  services.redis.servers."${misskeyName}" = {
     enable = true;
     port = 6379;
     bind = "127.0.0.1";
@@ -57,7 +66,7 @@
     package = pkgs.postgresql_18;
 
     # Database and user setup for Misskey
-    ensureDatabases = [ "misskey-mk-dev" ];
+    ensureDatabases = [ misskeyName ];
 
     # Allow local connections without password
     authentication = pkgs.lib.mkForce ''

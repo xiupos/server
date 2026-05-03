@@ -1,4 +1,7 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+let
+  misskeyName = "misskey-mk-main";
+in {
   environment.systemPackages = with pkgs; [ rclone ];
 
   sops.secrets."rclone/config" = {
@@ -9,22 +12,22 @@
   };
 
   # Backup Misskey PostgreSQL to R2
-  systemd.services."backup-misskey-mk-main-db-r2" = {
-    description = "Backup misskey-mk-main PostgreSQL to R2";
+  systemd.services."backup-${misskeyName}-db-r2" = {
+    description = "Backup ${misskeyName} PostgreSQL to R2";
     requires = [ "postgresql.service" ];
     after = [ "postgresql.service" ];
     serviceConfig = {
       Type = "oneshot";
       User = "postgres";
-      RuntimeDirectory = "backup-misskey-mk-main-db-r2";
+      RuntimeDirectory = "backup-${misskeyName}-db-r2";
     };
     script = ''
       set -euo pipefail
 
-      cp ${config.sops.secrets."rclone/config".path} /run/backup-misskey-mk-main-db-r2/rclone.conf
-      chmod 600 /run/backup-misskey-mk-main-db-r2/rclone.conf
+      cp ${config.sops.secrets."rclone/config".path} /run/backup-${misskeyName}-db-r2/rclone.conf
+      chmod 600 /run/backup-${misskeyName}-db-r2/rclone.conf
 
-      TMPFILE=$(mktemp /run/backup-misskey-mk-main-db-r2/misskey-pgdump-XXXXXX.sql.gz)
+      TMPFILE=$(mktemp /run/backup-${misskeyName}-db-r2/misskey-pgdump-XXXXXX.sql.gz)
       trap 'rm -f "$TMPFILE"' EXIT
 
       ${pkgs.postgresql_18}/bin/pg_dump \
@@ -32,16 +35,16 @@
         --no-acl \
         --clean \
         --if-exists \
-        misskey-mk-main \
+        ${misskeyName} \
         | ${pkgs.gzip}/bin/gzip > "$TMPFILE"
 
       ${pkgs.rclone}/bin/rclone \
-        --config /run/backup-misskey-mk-main-db-r2/rclone.conf \
+        --config /run/backup-${misskeyName}-db-r2/rclone.conf \
         copyto "$TMPFILE" \
-        r2:backup/misskey-mk-main/db/dump.sql.gz
+        r2:backup/${misskeyName}/db/dump.sql.gz
     '';
   };
-  systemd.timers."backup-misskey-mk-main-db-r2" = {
+  systemd.timers."backup-${misskeyName}-db-r2" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* *:00:00";
@@ -50,22 +53,22 @@
   };
 
   # Backup Misskey PostgreSQL to Google Drive
-  systemd.services."backup-misskey-mk-main-db-gdrive" = {
-    description = "Backup misskey-mk-main PostgreSQL to Google Drive";
+  systemd.services."backup-${misskeyName}-db-gdrive" = {
+    description = "Backup ${misskeyName} PostgreSQL to Google Drive";
     requires = [ "postgresql.service" ];
     after = [ "postgresql.service" ];
     serviceConfig = {
       Type = "oneshot";
       User = "postgres";
-      RuntimeDirectory = "backup-misskey-mk-main-db-gdrive";
+      RuntimeDirectory = "backup-${misskeyName}-db-gdrive";
     };
     script = ''
       set -euo pipefail
 
-      cp ${config.sops.secrets."rclone/config".path} /run/backup-misskey-mk-main-db-gdrive/rclone.conf
-      chmod 600 /run/backup-misskey-mk-main-db-gdrive/rclone.conf
+      cp ${config.sops.secrets."rclone/config".path} /run/backup-${misskeyName}-db-gdrive/rclone.conf
+      chmod 600 /run/backup-${misskeyName}-db-gdrive/rclone.conf
 
-      TMPFILE=$(mktemp /run/backup-misskey-mk-main-db-gdrive/misskey-pgdump-XXXXXX.sql.gz)
+      TMPFILE=$(mktemp /run/backup-${misskeyName}-db-gdrive/misskey-pgdump-XXXXXX.sql.gz)
       trap 'rm -f "$TMPFILE"' EXIT
 
       ${pkgs.postgresql_18}/bin/pg_dump \
@@ -73,16 +76,16 @@
         --no-acl \
         --clean \
         --if-exists \
-        misskey-mk-main \
+        ${misskeyName} \
         | ${pkgs.gzip}/bin/gzip > "$TMPFILE"
 
       ${pkgs.rclone}/bin/rclone \
-        --config /run/backup-misskey-mk-main-db-gdrive/rclone.conf \
+        --config /run/backup-${misskeyName}-db-gdrive/rclone.conf \
         copyto "$TMPFILE" \
-        gdrive:Backup/Servers/misskey-mk-main/db/dump.sql.gz
+        gdrive:Backup/Servers/${misskeyName}/db/dump.sql.gz
     '';
   };
-  systemd.timers."backup-misskey-mk-main-db-gdrive" = {
+  systemd.timers."backup-${misskeyName}-db-gdrive" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* *:30:00";
