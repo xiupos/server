@@ -1,0 +1,26 @@
+keys:
+  - &larch25102 age1l23arhrtyd03hgjylkx00nchttd4xtdk3ss9sz57ya9jeqvgdf9smcpanf
+  - &chatai age1hay9rsasz3vtyq3lh5pqx537gste56funxmy00llhzu2tp2nsqhqzvdnlw
+  - &misskey-main age1u52w739s9dcargxdhjlzdfkwlrlffcpdu95vxe5wt00n8nld8srsrjfsgv
+  - &misskey-test age1h95epvgh9keah5r63w3d3x8n7jqz6pd20zt4lzk8anzjlk7kyfcs549aje
+  - &monitor age1q5hs2dutmgn58gg7ajlhl3slhml5e7tsf5qywuxewgm3sqzkd46s72j0uv
+
+creation_rules:
+  - path_regex: secrets/misskey-test\.yaml$
+    key_groups:
+      - age:
+          - *misskey-test
+          - *larch25102
+
+  - path_regex: secrets/misskey-main\.yaml$
+    key_groups:
+      - age:
+          - *misskey-main
+          - *larch25102
+
+  - path_regex: secrets/rclone-backup\.yaml$
+    key_groups:
+      - age:
+          - *misskey-main
+          - *misskey-test
+          - *larch25102

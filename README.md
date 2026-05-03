@@ -1,113 +1,97 @@
 # Server
 
-## Initialise Server
-
-```sh
-# # local
-# ssh-keygen -R (server IP or hostname e.g. p-pleb-jp)
-# ssh root@(worker hostname) # yes
-
-# # root@(worker hostname) (if there is no non-root user)
-# adduser xiupos
-# gpasswd -a xiupos sudo
-# sudo -iu xiupos
-
-# # xiupos@(worker hostname)
-
-echo '%sudo ALL=(ALL:ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers
-
-curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up --ssh # login to tailscale
-
-# # now you can connect to ssh with just the command
-# ssh (worker hostname)
+```bash
+nix run nixpkgs#nixos-rebuild -- switch --flake '.#[host name]' --target-host root@[host name or ip]
+# or
+just deploy [host name]
 ```
 
-## Ansible
+## LXC
 
-```sh
-# jp
-ansible-playbook -i ansible/inventory/hosts-jp.yml ansible/site.yml
+- Network: IPv4, IPv6 -> DHCP
+- DNS Servers: `1.1.1.1`
 
-# us
-ansible-playbook -i ansible/inventory/hosts-us.yml ansible/site.yml
+Before launching
 
-# eu
-ansible-playbook -i ansible/inventory/hosts-eu.yml ansible/site.yml
+- Resources → Add → Device Passthrough: `/dev/net/tun` (for Tailscale)
+
+`/etc/pve/lxc/[CT ID].conf` on Proxmox
+
+```
+lxc.apparmor.profile: unconfined
+lxc.mount.entry: /dev/null sys/module/apparmor/parameters/enabled none bind 0 0
 ```
 
-## Set secrets
+Login to LXC via SSH
 
-Edit `base/secrets/*-example.yml`.
+```bash
+passwd # set password
 
-## Setup k3s cluster
-
-### Prepare kubeconfig
-
-```sh
-# set jp as default
-cp ~/.kube/config ~/.kube/config.old && cp ~/.kube/config-p-home-sapporo ~/.kube/config
-
-# # jp
-# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-home-sapporo"
-
-# # us
-# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-stlouis"
-
-# # eu
-# functions --erase kubectl && alias kubectl="kubectl --kubeconfig ~/.kube/config-p-contabo-nuremberg"
-
-# # unalias kubectl
-# functions --erase kubectl
+ln -sfn /nix/var/nix/profiles/system/init /sbin/init
+ln -sfn /nix/var/nix/profiles/system/init /init
 ```
 
-### Apply manifests
+After first `nixos-rebuild`
 
-```sh
-# jp
-kubectl kustomize --load-restrictor LoadRestrictionsNone overlays/jp | kubectl apply -f - --dry-run
+```bash
+tailscale up --ssh
+# Set ACL tags and disable key expiry
 ```
 
-## (WIP) Start Apps
+## Common
 
-### Misskey (mk-dev.xiupos.net; jp only)
+```bash
+# create age key
+mkdir -p /var/lib/sops-nix
+age-keygen -o /var/lib/sops-nix/key.txt
+# add pub key to .sops.yaml
+```
 
-1. %%% DISABLE THE DOMAIN (mk-dev.xiupos.net) FROM [DASHBOARD](https://one.dash.cloudflare.com/) %%%
-1. Prepare backup files in R2
-1. Comment out half part of `base/app/misskey/mk-dev-xiupos-net.yml`
-1. Start db:
-    ```sh
-    kubectl apply -f base/app/misskey/mk-dev-xiupos-net.yml
-    ```
-1. Edit `tools/postgres-db-restore.yml`
-1. Restore db:
-    ```sh
-    kubectl apply -f tools/postgres-db-restore.yml
-    ```
-1. Uncomment 2.
-1. Start misskey:
-    ```sh
-    kubectl apply -f base/app/misskey/mk-dev-xiupos-net.yml
-    ```
-1. Enable mk-dev.xiupos.net from [dashboard](https://one.dash.cloudflare.com/).
+## Restore
 
-### Misskey (mk.xiupos.net; jp only)
+```bash
+# Stop services w/o db
+systemctl stop cloudflared
+systemctl stop arion-misskey-mk-main
+systemctl stop backup-misskey-mk-main-db-r2.timer
+systemctl stop backup-misskey-mk-main-db-gdrive.timer
 
-1. %%% DISABLE THE DOMAIN (mk.xiupos.net) FROM [DASHBOARD](https://one.dash.cloudflare.com/) %%%
-1. Prepare backup files in R2
-1. Comment out half part of `base/app/misskey/mk-xiupos-net.yml`
-1. Start db:
-    ```sh
-    kubectl apply -f base/app/misskey/mk-xiupos-net.yml
-    ```
-1. Edit `tools/postgres-db-restore.yml`
-1. Restore db:
-    ```sh
-    kubectl apply -f tools/postgres-db-restore.yml
-    ```
-1. Uncomment 2.
-1. Start misskey:
-    ```sh
-    kubectl apply -f base/app/misskey/mk-xiupos-net.yml
-    ```
-1. Enable mk.xiupos.net from [dashboard](https://one.dash.cloudflare.com/).
+# List the backup
+rclone --config /etc/rclone.conf \
+  lsf gdrive:Backup/Servers/misskey-mk-main/db/ \
+  --format "tp" \
+  | sort
+
+# Drop and Create DB
+sudo -u postgres psql <<'EOF'
+DROP DATABASE IF EXISTS "misskey-mk-main";
+CREATE DATABASE "misskey-mk-main";
+EOF
+
+# Restore
+rclone --config /etc/rclone.conf \
+  cat gdrive:Data/Server/misskey-mk-xiupos-net/pgdump_misskey-mk-xiupos-net.sql.gz \
+| gunzip \
+| sudo -u postgres psql \
+    -d misskey-mk-main \
+    -v ON_ERROR_STOP=1
+
+# Check # of tables and notes
+sudo -u postgres psql -d misskey-mk-main -c "\dt" | head -20
+sudo -u postgres psql -d misskey-mk-main -c "SELECT COUNT(*) FROM \"note\";"
+
+# Start misskey
+systemctl start arion-misskey-mk-main
+
+# Check misskey log
+journalctl -u arion-misskey-mk-main -f
+
+# Start Cloudflare Tunnel
+# !!! DENGER !!!
+systemctl staXt cloudflared
+
+# Start Backup Timers
+# !!! DENGER !!!
+systemctl staXt backup-misskey-mk-main-db-r2.timer
+systemctl staXt backup-misskey-mk-main-db-gdrive.timer
+```
