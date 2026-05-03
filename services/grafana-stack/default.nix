@@ -13,6 +13,16 @@
         admin_user = "admin";
         admin_password = "admin";
       };
+
+      auth = {
+        disable_login_form = true;
+        disable_signout_menu = true;
+      };
+
+      "auth.anonymous" = {
+        enabled = true;
+        org_role = "Editor";
+      };
     };
 
     provision = {
