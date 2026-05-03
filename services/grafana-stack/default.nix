@@ -5,13 +5,9 @@
 
     settings = {
       log.level = "warn";
-
       users.allow_sign_up = false;
 
-      server = {
-        http_port = 3000;
-        # root_url = "https://monitor.tail7b2934.ts.net/";
-      };
+      server.http_port = 3000;
 
       security = {
         admin_user = "admin";
@@ -46,6 +42,8 @@
 
     retentionTime = "30d";
 
+    # Listen
+    listenAddress = "0.0.0.0";
     extraFlags = [
       "--web.enable-remote-write-receiver"
     ];
@@ -67,7 +65,10 @@
     enable = true;
     configuration = {
       auth_enabled = false;
-      server.http_listen_port = 3100;
+      server = {
+        http_listen_port = 3100;
+        http_listen_address = "0.0.0.0";
+      };
 
       ingester = {
         lifecycler = {
@@ -112,5 +113,12 @@
         reject_old_samples_max_age = "168h";
       };
     };
+  };
+
+  networking.firewall = {
+    allowedTCPPorts = [
+      9090  # Prometheus remote write
+      3100  # Loki push
+    ];
   };
 }

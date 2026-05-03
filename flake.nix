@@ -14,66 +14,87 @@
   };
 
   outputs = { nixpkgs, arion, sops-nix, ... }: {
-    nixosConfigurations.chatai = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        sops-nix.nixosModules.sops
-        arion.nixosModules.arion
-        ./modules/common.nix
-        ./modules/lxc.nix
-        ./modules/docker.nix
-        ./hosts/chatai/configuration.nix
+    nixosConfigurations = {
+      chatai = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          sops-nix.nixosModules.sops
+          arion.nixosModules.arion
+          ./modules/common.nix
+          ./modules/lxc.nix
+          ./modules/docker.nix
+          ./hosts/chatai/configuration.nix
 
-        # Open WebUI
-        ./services/open-webui
-      ];
-    };
+          # Open WebUI
+          ./services/open-webui
 
-    nixosConfigurations.misskey-test = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        sops-nix.nixosModules.sops
-        arion.nixosModules.arion
-        ./modules/common.nix
-        ./modules/lxc.nix
-        ./modules/docker.nix
-        ./hosts/misskey-test/configuration.nix
+          # Grafana Alloy
+          ./services/grafana-alloy
+          ./services/grafana-alloy/docker.nix
+        ];
+      };
 
-        # Misskey
-        ./services/misskey-mk-dev
-        ./services/misskey-mk-dev/backup.nix
-        ./services/cloudflare-tunnel
-      ];
-    };
+      misskey-test = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          sops-nix.nixosModules.sops
+          arion.nixosModules.arion
+          ./modules/common.nix
+          ./modules/lxc.nix
+          ./modules/docker.nix
+          ./hosts/misskey-test/configuration.nix
 
-    nixosConfigurations.misskey-main = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        sops-nix.nixosModules.sops
-        arion.nixosModules.arion
-        ./modules/common.nix
-        ./modules/lxc.nix
-        ./modules/docker.nix
-        ./hosts/misskey-main/configuration.nix
+          # Misskey
+          ./services/misskey-mk-dev
+          ./services/misskey-mk-dev/backup.nix
+          ./services/cloudflare-tunnel
 
-        # Misskey
-        ./services/misskey-mk-main
-        ./services/misskey-mk-main/backup.nix
-        ./services/cloudflare-tunnel
-      ];
-    };
+          # Grafana Alloy
+          ./services/grafana-alloy
+          ./services/grafana-alloy/docker.nix
+          ./services/grafana-alloy/postgres.nix
+        ];
+      };
 
-    nixosConfigurations.monitor = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        sops-nix.nixosModules.sops
-        ./modules/common.nix
-        ./modules/lxc.nix
-        ./hosts/monitor/configuration.nix
+      misskey-main = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          sops-nix.nixosModules.sops
+          arion.nixosModules.arion
+          ./modules/common.nix
+          ./modules/lxc.nix
+          ./modules/docker.nix
+          ./hosts/misskey-main/configuration.nix
 
-        # Grafana Stack
-        ./services/grafana-stack
-      ];
+          # Misskey
+          ./services/misskey-mk-main
+          ./services/misskey-mk-main/backup.nix
+          ./services/cloudflare-tunnel
+
+          # Grafana Alloy
+          ./services/grafana-alloy
+          ./services/grafana-alloy/docker.nix
+          ./services/grafana-alloy/postgres.nix
+        ];
+      };
+
+      monitor = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          sops-nix.nixosModules.sops
+          ./modules/common.nix
+          ./modules/lxc.nix
+          ./hosts/monitor/configuration.nix
+          ./services/grafana-alloy
+
+          # Grafana Stack
+          ./services/grafana-stack
+
+          # Grafana Alloy
+          ./services/grafana-alloy
+          ./services/grafana-alloy/rsyslog.nix
+        ];
+      };
     };
   };
 }
