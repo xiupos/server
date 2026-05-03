@@ -70,7 +70,7 @@ EOF
 
 # Restore
 rclone --config /etc/rclone.conf \
-  cat gdrive:Data/Server/misskey-mk-xiupos-net/pgdump_misskey-mk-xiupos-net.sql.gz \
+  cat gdrive:Backup/Servers/misskey-mk-main/db/dump.sql.gz \
 | gunzip \
 | sudo -u postgres psql \
     -d misskey-mk-main \

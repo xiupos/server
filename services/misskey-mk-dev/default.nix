@@ -4,7 +4,7 @@
     project.name = "misskey-mk-dev";
 
     services.web.service = {
-      image = "misskey/misskey:latest";
+      image = "misskey/misskey:2026.5.0";
       restart = "always";
       volumes = [
         "/etc/misskey-mk-dev/default.yml:/misskey/.config/default.yml:ro"
