@@ -1,6 +1,12 @@
 *.env
 *.env.local
 !*.example.env
+
+# secret files
 *.key
 keys.txt
 key.txt
+
+# nix build artifacts
+result
+result-*
