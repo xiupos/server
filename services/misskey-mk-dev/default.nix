@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
   misskeyName = "misskey-mk-dev";
-  misskeyImage = "misskey/misskey:2026.5.0";
+  misskeyImage = "misskey/misskey:2026.5.1";
   url = "https://mk-dev.xiupos.net/";
 in {
   system.activationScripts."pull-${misskeyName}".text = ''
