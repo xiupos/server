@@ -4,10 +4,6 @@ let
   misskeyName = name;
   misskeyImage = "misskey/misskey:${imageTag}";
 in {
-  system.activationScripts."pull-${misskeyName}".text = ''
-    ${pkgs.docker}/bin/docker pull ${misskeyImage}
-  '';
-
   # Misskey
   virtualisation.arion.projects."${misskeyName}".settings = {
     project.name = "${misskeyName}";
