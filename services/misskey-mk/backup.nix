@@ -1,11 +1,12 @@
+{ name, secretsPath }:
 { config, pkgs, ... }:
 let
-  misskeyName = "misskey-mk-dev";
+  misskeyName = name;
 in {
   environment.systemPackages = with pkgs; [ rclone ];
 
   sops.secrets."rclone/config" = {
-    sopsFile = ../../secrets/rclone-backup.yaml;
+    sopsFile = secretsPath + /rclone-backup.yaml;
     path = "/etc/rclone.conf";
     owner = "postgres";
     mode = "0400";

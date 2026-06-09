@@ -1,8 +1,8 @@
+{ name, url, imageTag, sharedBuffers ? "2GB", extraConfig ? "" }:
 { pkgs, ... }:
 let
-  misskeyName = "misskey-mk-dev";
-  misskeyImage = "misskey/misskey:2026.5.4";
-  url = "https://mk-dev.xiupos.net/";
+  misskeyName = name;
+  misskeyImage = "misskey/misskey:${imageTag}";
 in {
   system.activationScripts."pull-${misskeyName}".text = ''
     ${pkgs.docker}/bin/docker pull ${misskeyImage}
@@ -38,8 +38,7 @@ in {
       host: 127.0.0.1
       port: 6379
 
-    # Dummy proxy for testing
-    proxy: http://127.0.0.1:3128
+    ${extraConfig}
 
     proxyBypassHosts:
       - api.deepl.com
@@ -77,6 +76,6 @@ in {
 
     # Performance tuning for Misskey
     # (value suggested: 25% of total RAM)
-    settings.shared_buffers = "2GB";
+    settings.shared_buffers = sharedBuffers;
   };
 }

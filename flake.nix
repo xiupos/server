@@ -45,8 +45,16 @@
           ./hosts/misskey-test/configuration.nix
 
           # Misskey
-          ./services/misskey-mk-dev
-          ./services/misskey-mk-dev/backup.nix
+          (import ./services/misskey-mk {
+            name = "misskey-mk-dev";
+            url = "https://mk-dev.xiupos.net/";
+            imageTag = "2026.5.4";
+            extraConfig = "proxy: http://127.0.0.1:3128";
+          })
+          (import ./services/misskey-mk/backup.nix {
+            name = "misskey-mk-dev";
+            secretsPath = ./secrets;
+          })
           ./services/cloudflare-tunnel
 
           # Grafana Alloy
@@ -67,8 +75,15 @@
           ./hosts/misskey-main/configuration.nix
 
           # Misskey
-          ./services/misskey-mk-main
-          ./services/misskey-mk-main/backup.nix
+          (import ./services/misskey-mk {
+            name = "misskey-mk-main";
+            url = "https://mk.xiupos.net/";
+            imageTag = "2026.5.4";
+          })
+          (import ./services/misskey-mk/backup.nix {
+            name = "misskey-mk-main";
+            secretsPath = ./secrets;
+          })
           ./services/cloudflare-tunnel
 
           # Grafana Alloy
@@ -85,7 +100,6 @@
           ./modules/common.nix
           ./modules/lxc.nix
           ./hosts/monitor/configuration.nix
-          ./services/grafana-alloy
 
           # Grafana Stack
           ./services/grafana-stack
