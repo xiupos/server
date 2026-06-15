@@ -33,13 +33,13 @@
       "locked": {
         "lastModified": 1781446832,
         "narHash": "sha256-/6+NHQstxRqkbNjtNcQgCojzu59SEbdwwpWqBw7Fm9s=",
-        "owner": "zhaofengli",
+        "owner": "nix-community",
         "repo": "colmena",
         "rev": "938cb5cdd9b25d9774b6168e5f03d0afd04d321f",
         "type": "github"
       },
       "original": {
-        "owner": "zhaofengli",
+        "owner": "nix-community",
         "repo": "colmena",
         "type": "github"
       }
