@@ -1,9 +1,9 @@
 # Server
 
 ```bash
-nix run nixpkgs#nixos-rebuild -- switch --flake '.#[host name]' --target-host root@[host name or ip]
+just deploy-on [host name]
 # or
-just deploy [host name]
+nix run github:zhaofengli/colmena -- apply --on [host name]
 ```
 
 ## LXC
@@ -31,7 +31,7 @@ ln -sfn /nix/var/nix/profiles/system/init /sbin/init
 ln -sfn /nix/var/nix/profiles/system/init /init
 ```
 
-After first `nixos-rebuild`
+After first deploy
 
 ```bash
 tailscale up --ssh
