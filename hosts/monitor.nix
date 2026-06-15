@@ -1,5 +1,9 @@
-{ pkgs, ... }: {
-  imports = [];
+{ ... }: {
+  imports = [
+    ../services/grafana-stack
+    ../services/grafana-alloy
+    ../services/grafana-alloy/rsyslog.nix
+  ];
 
   # Networking
   networking.hostName = "monitor";

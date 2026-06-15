@@ -1,77 +1,76 @@
-{ name, url, imageTag, sharedBuffers ? "2GB", extraConfig ? "" }:
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
-  misskeyName = name;
-  misskeyImage = "misskey/misskey:${imageTag}";
+  cfg = config.services.misskey-mk;
 in {
-  # Misskey
-  virtualisation.arion.projects."${misskeyName}".settings = {
-    project.name = "${misskeyName}";
+  options.services.misskey-mk = {
+    enable = lib.mkEnableOption "Misskey";
+    name = lib.mkOption { type = lib.types.str; };
+    url = lib.mkOption { type = lib.types.str; };
+    imageTag = lib.mkOption { type = lib.types.str; };
+    sharedBuffers = lib.mkOption { type = lib.types.str; default = "2GB"; };
+    extraConfig = lib.mkOption { type = lib.types.lines; default = ""; };
+  };
 
-    services.web.service = {
-      image = misskeyImage;
-      restart = "always";
-      volumes = [
-        "/etc/${misskeyName}/default.yml:/misskey/.config/default.yml:ro"
-      ];
-      network_mode = "host";
+  config = lib.mkIf cfg.enable {
+    virtualisation.arion.projects."${cfg.name}".settings = {
+      project.name = cfg.name;
+
+      services.web.service = {
+        image = "misskey/misskey:${cfg.imageTag}";
+        restart = "always";
+        volumes = [
+          "/etc/${cfg.name}/default.yml:/misskey/.config/default.yml:ro"
+        ];
+        network_mode = "host";
+      };
     };
-  };
 
-  environment.etc."${misskeyName}/default.yml".text = ''
-    url: ${url}
-    port: 3000
+    environment.etc."${cfg.name}/default.yml".text = ''
+      url: ${cfg.url}
+      port: 3000
 
-    db:
-      host: 127.0.0.1
-      port: 5432
-      db: ${misskeyName}
-      user: postgres
-      extra:
-        statement_timeout: 0
+      db:
+        host: 127.0.0.1
+        port: 5432
+        db: ${cfg.name}
+        user: postgres
+        extra:
+          statement_timeout: 0
 
-    redis:
-      host: 127.0.0.1
-      port: 6379
+      redis:
+        host: 127.0.0.1
+        port: 6379
 
-    ${extraConfig}
+      ${cfg.extraConfig}
 
-    proxyBypassHosts:
-      - api.deepl.com
-      - api-free.deepl.com
-      - www.recaptcha.net
-      - hcaptcha.com
-      - challenges.cloudflare.com
+      proxyBypassHosts:
+        - api.deepl.com
+        - api-free.deepl.com
+        - www.recaptcha.net
+        - hcaptcha.com
+        - challenges.cloudflare.com
 
-    id: 'aid'
+      id: 'aid'
 
-    signToActivityPubGet: true
-  '';
-
-  # Redis
-  services.redis.servers."${misskeyName}" = {
-    enable = true;
-    port = 6379;
-    bind = "127.0.0.1";
-  };
-
-  # PostgreSQL
-  services.postgresql = {
-    enable = true;
-    package = pkgs.postgresql_18;
-
-    # Database and user setup for Misskey
-    ensureDatabases = [ misskeyName ];
-
-    # Allow local connections without password
-    authentication = pkgs.lib.mkForce ''
-      local all all trust
-      host  all all 127.0.0.1/32 trust
-      host  all all ::1/128 trust
+      signToActivityPubGet: true
     '';
 
-    # Performance tuning for Misskey
-    # (value suggested: 25% of total RAM)
-    settings.shared_buffers = sharedBuffers;
+    services.redis.servers."${cfg.name}" = {
+      enable = true;
+      port = 6379;
+      bind = "127.0.0.1";
+    };
+
+    services.postgresql = {
+      enable = true;
+      package = pkgs.postgresql_18;
+      ensureDatabases = [ cfg.name ];
+      authentication = pkgs.lib.mkForce ''
+        local all all trust
+        host  all all 127.0.0.1/32 trust
+        host  all all ::1/128 trust
+      '';
+      settings.shared_buffers = cfg.sharedBuffers;
+    };
   };
 }
