@@ -4,13 +4,14 @@
     colmena.url = "github:nix-community/colmena";
     arion = { url = "github:hercules-ci/arion"; inputs.nixpkgs.follows = "nixpkgs"; };
     sops-nix = { url = "github:Mic92/sops-nix"; inputs.nixpkgs.follows = "nixpkgs"; };
+    claude-code.url = "github:sadjow/claude-code-nix";
   };
 
-  outputs = { nixpkgs, colmena, arion, sops-nix, ... }: {
+  outputs = { nixpkgs, colmena, arion, sops-nix, claude-code, ... }: {
     colmenaHive = colmena.lib.makeHive {
       meta = {
         nixpkgs = import nixpkgs { system = "x86_64-linux"; };
-        specialArgs = { inherit arion sops-nix; };
+        specialArgs = { inherit arion sops-nix claude-code; };
       };
 
       defaults = { sops-nix, ... }: {
@@ -19,6 +20,11 @@
           ./modules/common.nix
           ./modules/lxc.nix
         ];
+      };
+
+      agent = { ... }: {
+        deployment.targetHost = "agent";
+        imports = [ ./hosts/agent.nix ];
       };
 
       chatai = { ... }: {

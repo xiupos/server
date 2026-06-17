@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   # Networking
   services.tailscale.enable = true;
+  services.tailscale.openFirewall = true;
   networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
   # Timezone

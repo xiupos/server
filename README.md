@@ -41,7 +41,7 @@ tailscale up --ssh
 ## Common
 
 ```bash
-# create age key
+# create age key if need
 mkdir -p /var/lib/sops-nix
 age-keygen -o /var/lib/sops-nix/key.txt
 # add pub key to .sops.yaml
