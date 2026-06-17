@@ -22,11 +22,6 @@
         ];
       };
 
-      agent = { ... }: {
-        deployment.targetHost = "agent";
-        imports = [ ./hosts/agent.nix ];
-      };
-
       chatai = { ... }: {
         deployment.targetHost = "chatai";
         imports = [ ./hosts/chatai.nix ];
