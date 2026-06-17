@@ -1,6 +1,7 @@
 { ... }: {
   imports = [
     ../services/grafana-stack
+    ../services/grafana-stack/backup-dashboard.nix
     ../services/grafana-alloy
     ../services/grafana-alloy/rsyslog.nix
   ];
