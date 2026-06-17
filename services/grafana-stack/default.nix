@@ -32,13 +32,16 @@
         {
           name = "Prometheus";
           type = "prometheus";
+          uid = "prometheus";
           url = "http://localhost:9090";
           isDefault = true;
           editable = false;
+          jsonData.timeInterval = "60s";
         }
         {
           name = "Loki";
           type = "loki";
+          uid = "loki";
           url = "http://localhost:3100";
           editable = false;
         }

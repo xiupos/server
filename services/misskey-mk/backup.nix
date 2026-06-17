@@ -29,6 +29,7 @@ in {
       };
       script = ''
         set -euo pipefail
+        trap 'echo "backup: Failed" >&2' ERR
 
         cp ${config.sops.secrets."rclone/config".path} /run/backup-${mkName}-db-r2/rclone.conf
         chmod 600 /run/backup-${mkName}-db-r2/rclone.conf
@@ -48,6 +49,8 @@ in {
           --config /run/backup-${mkName}-db-r2/rclone.conf \
           copyto "$TMPFILE" \
           r2:backup/${mkName}/db/dump.sql.gz
+
+        echo "backup: Succeeded"
       '';
     };
     systemd.timers."backup-${mkName}-db-r2" = {
@@ -69,6 +72,7 @@ in {
       };
       script = ''
         set -euo pipefail
+        trap 'echo "backup: Failed" >&2' ERR
 
         cp ${config.sops.secrets."rclone/config".path} /run/backup-${mkName}-db-gdrive/rclone.conf
         chmod 600 /run/backup-${mkName}-db-gdrive/rclone.conf
@@ -88,6 +92,8 @@ in {
           --config /run/backup-${mkName}-db-gdrive/rclone.conf \
           copyto "$TMPFILE" \
           gdrive:Backup/Servers/${mkName}/db/dump.sql.gz
+
+        echo "backup: Succeeded"
       '';
     };
     systemd.timers."backup-${mkName}-db-gdrive" = {

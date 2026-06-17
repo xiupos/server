@@ -4,22 +4,22 @@ let
 
   qSuccessCount = unitRegex: {
     datasource = lokiDs;
-    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "Succeeded" [$__range])'';
+    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Succeeded" [$__range])'';
     legendFormat = "successes";
   };
   qFailureCount = unitRegex: {
     datasource = lokiDs;
-    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "Failed" [$__range])'';
+    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Failed" [$__range])'';
     legendFormat = "failures";
   };
   qSuccessTs = unitRegex: label: {
     datasource = lokiDs;
-    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "Succeeded" [$__interval])'';
+    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Succeeded" [$__interval])'';
     legendFormat = "${label} success";
   };
   qFailureTs = unitRegex: label: {
     datasource = lokiDs;
-    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "Failed" [$__interval])'';
+    expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Failed" [$__interval])'';
     legendFormat = "${label} failure";
   };
 
@@ -114,21 +114,21 @@ let
       (statPanel {
         id = 2; title = "Successes (selected range)";
         gridPos = { x = 0; y = 1; w = 6; h = 4; };
-        targets = [ (qSuccessCount "backup-.+-db-r2\\.service") ];
+        targets = [ (qSuccessCount "backup-.+-db-r2\\\\.service") ];
         thresholds = thresholdsSuccess;
       })
       (statPanel {
         id = 3; title = "Failures (selected range)";
         gridPos = { x = 6; y = 1; w = 6; h = 4; };
-        targets = [ (qFailureCount "backup-.+-db-r2\\.service") ];
+        targets = [ (qFailureCount "backup-.+-db-r2\\\\.service") ];
         thresholds = thresholdsFailure;
       })
       (timeseriesPanel {
         id = 4; title = "Hourly results — R2";
         gridPos = { x = 12; y = 1; w = 12; h = 8; };
         targets = [
-          (qSuccessTs "backup-.+-db-r2\\.service" "R2")
-          (qFailureTs "backup-.+-db-r2\\.service" "R2")
+          (qSuccessTs "backup-.+-db-r2\\\\.service" "R2")
+          (qFailureTs "backup-.+-db-r2\\\\.service" "R2")
         ];
       })
 
@@ -141,21 +141,21 @@ let
       (statPanel {
         id = 6; title = "Successes (selected range)";
         gridPos = { x = 0; y = 6; w = 6; h = 4; };
-        targets = [ (qSuccessCount "backup-.+-db-gdrive\\.service") ];
+        targets = [ (qSuccessCount "backup-.+-db-gdrive\\\\.service") ];
         thresholds = thresholdsSuccess;
       })
       (statPanel {
         id = 7; title = "Failures (selected range)";
         gridPos = { x = 6; y = 6; w = 6; h = 4; };
-        targets = [ (qFailureCount "backup-.+-db-gdrive\\.service") ];
+        targets = [ (qFailureCount "backup-.+-db-gdrive\\\\.service") ];
         thresholds = thresholdsFailure;
       })
       (timeseriesPanel {
         id = 8; title = "Hourly results — Google Drive";
         gridPos = { x = 12; y = 6; w = 12; h = 8; };
         targets = [
-          (qSuccessTs "backup-.+-db-gdrive\\.service" "GDrive")
-          (qFailureTs "backup-.+-db-gdrive\\.service" "GDrive")
+          (qSuccessTs "backup-.+-db-gdrive\\\\.service" "GDrive")
+          (qFailureTs "backup-.+-db-gdrive\\\\.service" "GDrive")
         ];
       })
 
