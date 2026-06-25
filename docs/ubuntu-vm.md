@@ -16,4 +16,7 @@ sudo apt-get install -y unattended-upgrades debconf-utils
 echo "unattended-upgrades unattended-upgrades/enable_auto_updates boolean true" | sudo debconf-set-selections
 sudo dpkg-reconfigure -f noninteractive unattended-upgrades
 sudo sed -i 's|//\s*\("\${distro_id}:\${distro_codename}-updates";\)|\1|' /etc/apt/apt.conf.d/50unattended-upgrades
+
+sudo apt install -y qemu-guest-agent
+sudo systemctl enable qemu-guest-agent --now
 ```
