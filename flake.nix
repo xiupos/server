@@ -41,6 +41,11 @@
         deployment.targetHost = "monitor";
         imports = [ ./hosts/monitor.nix ];
       };
+
+      pgdb = { ... }: {
+        deployment.targetHost = "pgdb";
+        imports = [ ./hosts/pgdb.nix ];
+      };
     };
   };
 }

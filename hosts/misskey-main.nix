@@ -10,10 +10,13 @@
     ../services/grafana-alloy/postgres.nix
   ];
 
+  # Networking
   networking.hostName = "misskey-main";
-  system.stateVersion = "26.05";
+
+  # Secrets
   sops.defaultSopsFile = ../secrets/misskey-main.yaml;
 
+  # Misskey
   services.misskey-mk = {
     enable = true;
     name = "misskey-mk-main";
@@ -21,8 +24,12 @@
     imageTag = "2026.5.4";
   };
 
+  # Misskey backup
   services.misskey-mk-backup = {
     enable = true;
     sopsFile = ../secrets/rclone-backup.yaml;
   };
+
+  # System state version
+  system.stateVersion = "26.05";
 }

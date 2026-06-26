@@ -17,3 +17,6 @@ build-on hostname:
 
 update:
   nix flake update
+
+update-keys:
+  sops updatekeys secrets/*.yaml

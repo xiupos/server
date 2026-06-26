@@ -4,6 +4,7 @@ keys:
   - &misskey-main age1u52w739s9dcargxdhjlzdfkwlrlffcpdu95vxe5wt00n8nld8srsrjfsgv
   - &misskey-test age1ln7h3uleteqp2audj4h3rrjzprgvf4rpfpjc9t2nf40zystruppsw76p26
   - &monitor age1q5hs2dutmgn58gg7ajlhl3slhml5e7tsf5qywuxewgm3sqzkd46s72j0uv
+  - &pgdb age10thm320uk8vnyhjx5f2x5nwjy49vx309s3948rzd5agutpdgqsuq0lku6p
 
 creation_rules:
   - path_regex: secrets/misskey-test\.yaml$
