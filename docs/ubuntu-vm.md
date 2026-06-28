@@ -20,3 +20,12 @@ sudo sed -i 's|//\s*\("\${distro_id}:\${distro_codename}-updates";\)|\1|' /etc/a
 sudo apt install -y qemu-guest-agent
 sudo systemctl enable qemu-guest-agent --now
 ```
+
+## Serial Terminal
+
+Hardware -> Add -> Serial Port -> `0`
+
+```bash
+sudo systemctl enable --now serial-getty@ttyS0.service
+sudo sed -i 's/^\(GRUB_CMDLINE_LINUX="\)\(.*\)"/\1\2 console=tty0 console=ttyS0,115200"/' /etc/default/grub
+```
