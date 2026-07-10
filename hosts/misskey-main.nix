@@ -21,7 +21,7 @@
     enable = true;
     name = "misskey-mk-main";
     url = "https://mk.xiupos.net/";
-    imageTag = "2026.5.4";
+    imageTag = "2026.6.0";
   };
 
   # Misskey backup

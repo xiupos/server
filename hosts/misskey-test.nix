@@ -21,7 +21,7 @@
     enable = true;
     name = "misskey-mk-dev";
     url = "https://mk-dev.xiupos.net/";
-    imageTag = "2026.5.4";
+    imageTag = "2026.6.0";
     extraConfig = "proxy: http://127.0.0.1:3128";
   };
 
