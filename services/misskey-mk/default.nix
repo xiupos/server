@@ -55,6 +55,20 @@ in {
       signToActivityPubGet: true
     '';
 
+    # Weekly restart of the Misskey web service to prevent memory leaks
+    systemd.services."restart-${cfg.name}" = {
+      description = "Weekly restart of ${cfg.name} web service";
+      serviceConfig.Type = "oneshot";
+      script = "${pkgs.systemd}/bin/systemctl restart arion-${cfg.name}.service";
+    };
+    systemd.timers."restart-${cfg.name}" = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "Sun 04:00:00";
+        Persistent = true;
+      };
+    };
+
     services.redis.servers."${cfg.name}" = {
       enable = true;
       port = 6379;
