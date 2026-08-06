@@ -26,6 +26,9 @@ in {
         Type = "oneshot";
         User = "postgres";
         RuntimeDirectory = "backup-${mkName}-db-r2";
+        MemoryMax = "1536M";
+        Nice = 19;
+        IOSchedulingClass = "idle";
       };
       script = ''
         set -euo pipefail
@@ -69,6 +72,9 @@ in {
         Type = "oneshot";
         User = "postgres";
         RuntimeDirectory = "backup-${mkName}-db-gdrive";
+        MemoryMax = "1536M";
+        Nice = 19;
+        IOSchedulingClass = "idle";
       };
       script = ''
         set -euo pipefail
