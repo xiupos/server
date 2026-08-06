@@ -25,8 +25,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         User = "postgres";
-        RuntimeDirectory = "backup-${mkName}-db-r2";
-        MemoryMax = "4096M";
+        MemoryMax = "2048M";
         Nice = 19;
         IOSchedulingClass = "idle";
       };
@@ -34,24 +33,17 @@ in {
         set -euo pipefail
         trap 'echo "backup: Failed" >&2' ERR
 
-        cp ${config.sops.secrets."rclone/config".path} /run/backup-${mkName}-db-r2/rclone.conf
-        chmod 600 /run/backup-${mkName}-db-r2/rclone.conf
-
-        TMPFILE=$(mktemp /run/backup-${mkName}-db-r2/misskey-pgdump-XXXXXX.sql.gz)
-        trap 'rm -f "$TMPFILE"' EXIT
-
         ${pkgs.postgresql_18}/bin/pg_dump \
           --no-owner \
           --no-acl \
           --clean \
           --if-exists \
           ${mkName} \
-          | ${pkgs.gzip}/bin/gzip > "$TMPFILE"
-
-        ${pkgs.rclone}/bin/rclone \
-          --config /run/backup-${mkName}-db-r2/rclone.conf \
-          copyto "$TMPFILE" \
-          r2:backup/${mkName}/db/dump.sql.gz
+          | ${pkgs.gzip}/bin/gzip \
+          | ${pkgs.rclone}/bin/rclone \
+              --config ${config.sops.secrets."rclone/config".path} \
+              rcat \
+              r2:backup/${mkName}/db/dump.sql.gz
 
         echo "backup: Succeeded"
       '';
@@ -71,8 +63,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         User = "postgres";
-        RuntimeDirectory = "backup-${mkName}-db-gdrive";
-        MemoryMax = "4096M";
+        MemoryMax = "2048M";
         Nice = 19;
         IOSchedulingClass = "idle";
       };
@@ -80,24 +71,17 @@ in {
         set -euo pipefail
         trap 'echo "backup: Failed" >&2' ERR
 
-        cp ${config.sops.secrets."rclone/config".path} /run/backup-${mkName}-db-gdrive/rclone.conf
-        chmod 600 /run/backup-${mkName}-db-gdrive/rclone.conf
-
-        TMPFILE=$(mktemp /run/backup-${mkName}-db-gdrive/misskey-pgdump-XXXXXX.sql.gz)
-        trap 'rm -f "$TMPFILE"' EXIT
-
         ${pkgs.postgresql_18}/bin/pg_dump \
           --no-owner \
           --no-acl \
           --clean \
           --if-exists \
           ${mkName} \
-          | ${pkgs.gzip}/bin/gzip > "$TMPFILE"
-
-        ${pkgs.rclone}/bin/rclone \
-          --config /run/backup-${mkName}-db-gdrive/rclone.conf \
-          copyto "$TMPFILE" \
-          gdrive:Backup/Servers/${mkName}/db/dump.sql.gz
+          | ${pkgs.gzip}/bin/gzip \
+          | ${pkgs.rclone}/bin/rclone \
+              --config ${config.sops.secrets."rclone/config".path} \
+              rcat \
+              gdrive:Backup/Servers/${mkName}/db/dump.sql.gz
 
         echo "backup: Succeeded"
       '';
