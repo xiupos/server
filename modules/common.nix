@@ -4,6 +4,10 @@
   services.tailscale.openFirewall = true;
   networking.firewall.trustedInterfaces = [ "tailscale0" ];
 
+  # To prevent SSH disconnection during deployment
+  systemd.services.tailscaled.restartIfChanged = false;
+  systemd.services.dhcpcd.restartIfChanged = false;
+
   # Timezone
   time.timeZone = "Asia/Tokyo";
 

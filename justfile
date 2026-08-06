@@ -4,16 +4,16 @@ check:
   nix flake check
 
 deploy:
-  {{colmena}} apply
+  {{colmena}} apply --parallel 1
 
 deploy-on hostname:
-  {{colmena}} apply --on {{hostname}}
+  {{colmena}} apply --on {{hostname}} --parallel 1
 
 build:
-  {{colmena}} build
+  {{colmena}} build --parallel 1
 
 build-on hostname:
-  {{colmena}} build --on {{hostname}}
+  {{colmena}} build --on {{hostname}} --parallel 1
 
 update:
   nix flake update
