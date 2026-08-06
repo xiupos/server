@@ -26,7 +26,7 @@ in {
         Type = "oneshot";
         User = "postgres";
         RuntimeDirectory = "backup-${mkName}-db-r2";
-        MemoryMax = "1536M";
+        MemoryMax = "4096M";
         Nice = 19;
         IOSchedulingClass = "idle";
       };
@@ -72,7 +72,7 @@ in {
         Type = "oneshot";
         User = "postgres";
         RuntimeDirectory = "backup-${mkName}-db-gdrive";
-        MemoryMax = "1536M";
+        MemoryMax = "4096M";
         Nice = 19;
         IOSchedulingClass = "idle";
       };
