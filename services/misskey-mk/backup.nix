@@ -66,10 +66,16 @@ in {
         MemoryMax = "2048M";
         Nice = 19;
         IOSchedulingClass = "idle";
+        StateDirectory = "rclone-${mkName}";
       };
       script = ''
         set -euo pipefail
         trap 'echo "backup: Failed" >&2' ERR
+
+        state_config="/var/lib/rclone-${mkName}/rclone.conf"
+        if [ ! -f "$state_config" ]; then
+          ${pkgs.coreutils}/bin/install -m 0600 ${config.sops.secrets."rclone/config".path} "$state_config"
+        fi
 
         ${pkgs.postgresql_18}/bin/pg_dump \
           --no-owner \
@@ -79,7 +85,7 @@ in {
           ${mkName} \
           | ${pkgs.gzip}/bin/gzip \
           | ${pkgs.rclone}/bin/rclone \
-              --config ${config.sops.secrets."rclone/config".path} \
+              --config "$state_config" \
               rcat \
               gdrive:Backup/Servers/${mkName}/db/dump.sql.gz
 

@@ -4,11 +4,13 @@ let
 
   qSuccessCount = unitRegex: {
     datasource = lokiDs;
+    queryType = "instant";
     expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Succeeded" [$__range])'';
     legendFormat = "successes";
   };
   qFailureCount = unitRegex: {
     datasource = lokiDs;
+    queryType = "instant";
     expr = ''count_over_time({job="journal", instance="$instance", unit=~"${unitRegex}"} |= "backup: Failed" [$__range])'';
     legendFormat = "failures";
   };
