@@ -120,11 +120,13 @@
       compactor = {
         working_directory = "/var/lib/loki/compactor";
         delete_request_store = "filesystem";
+        retention_enabled = true;
       };
 
       limits_config = {
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
+        retention_period = "30d";
       };
     };
   };

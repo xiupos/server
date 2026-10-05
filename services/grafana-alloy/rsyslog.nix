@@ -2,6 +2,8 @@
   # Rsyslogd
   services.rsyslogd = {
     enable = true;
+    # Forward only; logs are stored in Loki
+    defaultConfig = "";
     extraConfig = ''
       module(load="imudp")
       input(type="imudp" port="514")
