@@ -10,3 +10,6 @@ key.txt
 # nix build artifacts
 result
 result-*
+
+# local-only notes (not published)
+private/
