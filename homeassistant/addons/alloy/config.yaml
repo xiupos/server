@@ -1,0 +1,10 @@
+name: Grafana Alloy
+version: "1.22.0"
+slug: alloy
+description: Push Home Assistant metrics to monitor (Prometheus remote_write)
+arch:
+  - amd64
+init: false
+startup: services
+boot: auto
+homeassistant_api: true

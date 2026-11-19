@@ -1,0 +1,18 @@
+// Scrape HA's /api/prometheus through the Supervisor proxy (no long-lived
+// token needed) and push to monitor over the tailnet.
+prometheus.scrape "homeassistant" {
+  targets = [{
+    __address__      = "supervisor",
+    __metrics_path__ = "/core/api/prometheus",
+    instance         = "homeassistant",
+  }]
+  job_name        = "homeassistant"
+  bearer_token    = sys.env("SUPERVISOR_TOKEN")
+  scrape_interval = "60s"
+  forward_to      = [prometheus.remote_write.monitor.receiver]
+}
+
+// MagicDNS doesn't resolve inside HA OS containers; use monitor's tailnet IP.
+prometheus.remote_write "monitor" {
+  endpoint { url = "http://100.65.216.12:9090/api/v1/write" }
+}
