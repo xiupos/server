@@ -59,3 +59,26 @@ tailscale set --advertise-routes=10.x.0.0/24
 # https://login.tailscale.com/admin/machines
 # machine -> Edit route settings... -> Subnet routes -> [x] 10.x.0.0/24
 ```
+
+## USB Bluetooth passthrough to a VM
+
+Host `btusb` grabs Intel adapters while they re-enumerate during firmware load, so the VM never sees `hci0`. Keep it off the host.
+
+```sh
+lsusb | grep -i bluetooth  # e.g. 8087:0026
+
+echo 'blacklist btusb' > /etc/modprobe.d/blacklist-btusb.conf
+modprobe -r btusb
+
+qm set <vmid> -usb0 host=8087:0026  # by ID, not port
+qm reboot <vmid>
+```
+
+Check:
+
+```sh
+ls /sys/class/bluetooth              # host: empty, guest: hci0
+echo 'info usb' | qm monitor <vmid>
+```
+
+Revert: `rm /etc/modprobe.d/blacklist-btusb.conf && modprobe btusb`.
