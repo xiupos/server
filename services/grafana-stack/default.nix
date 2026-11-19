@@ -131,10 +131,7 @@
     };
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [
-      9090  # Prometheus remote write
-      3100  # Loki push
-    ];
-  };
+  # Prometheus (9090) and Loki (3100) have no auth, so they are not opened on
+  # the LAN. Alloy on each host pushes via MagicDNS `monitor` over tailscale0,
+  # which is a trusted interface (modules/common.nix).
 }
